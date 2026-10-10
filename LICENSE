@@ -1,3 +1,11 @@
+SCOPE NOTICE
+
+This MIT license applies ONLY to the website code and tooling in this
+repository (the site files and generator scripts). It does NOT apply
+to the question content. Specifically, the question templates and generated
+question/solution data. which is governed separately:
+see CONTENT-LICENSE.
+
 MIT License
 
 Copyright (c) 2026 jonathankmac
@@ -19,3 +27,26 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+CONTENT LICENSE — ALL RIGHTS RESERVED
+
+Copyright (c) 2026 jonathankmac
+
+This license governs the question content of this repository: all
+question templates and template definitions, and all generated
+question, solution, and answer data (including every .json file
+under /content/).
+
+This content is NOT open source. All rights are reserved. You may
+not copy, redistribute, republish, sublicense, sell, or create
+derivative works from this content — commercially or otherwise —
+without the author's prior written permission.
+
+Permitted without permission:
+  - Using the deployed website as intended, for personal study.
+  - Contributing to this repository: by submitting a template or
+    content via pull request, you grant jonathankmac a perpetual,
+    worldwide, royalty-free license to use, modify, and distribute
+    that contribution as part of this project, under these terms.
+
+Inquiries: open a GitHub issue in this repository.

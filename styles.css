@@ -1,0 +1,314 @@
+/* ============================================================
+   MacEng Practice — styles
+   McMaster Heritage palette. Current scope: background, header,
+   course bookmarks. Question/solution styles return later.
+   ============================================================ */
+
+:root {
+  --bg: #FAF9F7;
+  --surface: #FFFFFF;
+  --ink: #1C1B1A;
+  --grey: #495965;        /* Heritage Grey */
+  --border: #DBDBDD;      /* Dundurn Grey */
+  --maroon: #7A003C;      /* Heritage Maroon */
+  --maroon-shade: #5C002D;
+  --maroon-tint: #E4CCD8; /* 20% tint */
+  --maroon-wash: #F2E7ED; /* 10% tint */
+  --gold: #FDBF57;        /* Heritage Gold */
+
+  --radius: 6px;
+  --fast: 90ms;           /* speedy interaction budget */
+  --font-ui: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: "Source Serif 4", Georgia, Charter, "Times New Roman", serif;
+}
+
+/* ---------- base ---------- */
+
+* { box-sizing: border-box; }
+
+html { height: 100%; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.5;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+::selection {
+  background: var(--maroon-tint);
+}
+
+/* ---------- full-height layout ---------- */
+
+.site-header {
+  padding: clamp(36px, 9vh, 88px) clamp(16px, 4vw, 48px) 10px;
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+/* Back button rides the header's left edge, level with the wordmark.
+   Vertical center = header top padding + half the wordmark line. */
+.btn-back {
+  position: absolute;
+  left: clamp(16px, 4vw, 48px);
+  top: calc(clamp(36px, 9vh, 88px) + clamp(34px, 7vw, 68px) * 0.75);
+  transform: translateY(-50%);
+  min-height: 44px;
+  padding: 8px 16px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #FFFFFF;
+  background: var(--maroon);
+  border-radius: var(--radius);
+  transition: background-color var(--fast) ease, transform var(--fast) ease;
+}
+
+.btn-back:hover { background: var(--maroon-shade); }
+.btn-back:active { transform: translateY(-50%) scale(0.97); }
+
+.wordmark {
+  display: inline-block;
+  font-family: var(--font-serif);
+  font-size: clamp(34px, 7vw, 68px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--gold);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.col {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: clamp(16px, 4vh, 40px) clamp(16px, 4vw, 48px) clamp(24px, 5vh, 48px);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* few elements still fill the page */
+  position: relative;
+  z-index: 2;
+}
+
+.site-footer {
+  padding: 16px clamp(16px, 4vw, 48px) clamp(44px, 7vh, 64px);
+  text-align: center;
+  font-size: clamp(12px, 1.4vw, 14px);
+  color: rgba(255, 255, 255, 0.55);
+  position: relative;
+  z-index: 2;
+}
+
+/* ---------- random background (one image, chosen at load) ---------- */
+
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  /* soft grey fallback: visible whenever no photo loads */
+  background-color: #D9D9DC;
+  background-size: cover;
+  background-position: center;
+}
+
+.bg-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  /* dark wash, lightened: photo shows through at ~55% while the UI
+     still wins on contrast. */
+  background: rgba(10, 8, 9, 0.45);
+  transition: opacity 300ms ease;
+}
+
+/* no-photo mode: grey background speaks for itself, scrim off,
+   and page chrome flips to the colors that suit a light surface */
+.no-photo .bg-scrim {
+  opacity: 0;
+}
+
+.no-photo .wordmark {
+  color: var(--maroon);
+  text-shadow: none;
+}
+
+.no-photo .site-footer {
+  color: var(--grey);
+}
+
+.bg-credit {
+  position: fixed;
+  right: 8px;
+  bottom: 8px;
+  z-index: 3;
+  max-width: min(60vw, 260px);
+  padding: 4px 8px;
+  font-size: clamp(10px, 1.2vw, 12px);
+  line-height: 1.3;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(10, 8, 9, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius);
+}
+
+/* ---------- views ---------- */
+
+.view {
+  width: 100%;
+  animation: fadein 120ms ease-out;
+}
+
+@keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ---------- course bookmarks ----------
+   Long rectangles with a small triangular notch cut into the
+   right edge: maroon field, gold spine, Fraunces label. */
+
+.bookmark-row {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 2.5vh, 22px);
+}
+
+.bookmark {
+  position: relative;
+  width: 100%;
+  min-height: clamp(56px, 9vh, 84px);
+  padding: clamp(12px, 2vh, 20px) 40px clamp(12px, 2vh, 20px) clamp(16px, 3vw, 28px);
+  text-align: left;
+  color: #FFFFFF;
+  background: var(--maroon);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 16px) 50%, 100% 100%, 0 100%);
+  transition: transform var(--fast) ease, background-color var(--fast) ease;
+}
+
+/* gold spine down the left edge */
+.bookmark::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: var(--gold);
+}
+
+.bookmark-label {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: clamp(17px, 1.4vw + 12px, 24px);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.3;
+}
+
+.bookmark-label .dot {
+  color: var(--gold);
+  font-style: normal;
+  margin: 0 2px;
+}
+
+.bookmark:hover {
+  background: var(--maroon-shade);
+  transform: translateX(4px);
+}
+
+.bookmark:active {
+  transform: translateX(4px) scale(0.99);
+}
+
+/* hover: gold hairline inset — fleeting, not a persistent selected state */
+.bookmark:hover::after {
+  content: "";
+  position: absolute;
+  inset: 4px 6px 4px 4px;
+  border: 2px solid var(--gold);
+  pointer-events: none;
+}
+
+/* ---------- question → answer (sample loop) ---------- */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: clamp(18px, 3vh, 28px) clamp(16px, 3vw, 26px);
+  box-shadow: 0 1px 3px rgba(28, 27, 26, 0.06);
+}
+
+.q-text {
+  font-size: clamp(17px, 1.2vw + 13px, 19px);
+  line-height: 1.65;
+  white-space: pre-line;
+}
+
+.a-box {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: clamp(16px, 1.1vw + 12px, 18px);
+  line-height: 1.6;
+  animation: fadein 150ms ease-out;
+}
+
+.btn-main {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 16px;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #FFFFFF;
+  background: var(--maroon);
+  border-radius: var(--radius);
+  transition: background-color var(--fast) ease, transform var(--fast) ease;
+}
+
+.btn-main:hover { background: var(--maroon-shade); }
+.btn-main:active { transform: translateY(1px); }
+
+.katex-display {
+  margin: 12px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .view, .bookmark, .bg, .btn-main, .a-box {
+    animation: none;
+    transition: none;
+  }
+}

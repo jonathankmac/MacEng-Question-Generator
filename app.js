@@ -1,17 +1,12 @@
 /* ============================================================
    MacEng Practice — app.js
-   v1 scope right now: background + course selection only.
-   The question → solution cycle is torn out; it will be rebuilt
-   on top of generate.py's content banks later.
+   Section 1: random background (one image via manifest).
+   Section 2: course selection + question/answer-check loop.
+   Questions are served from content/*.json banks; answers are
+   numeric with a tolerance + unit, so checking is arithmetic.
    ============================================================ */
 
-/* ---------------- Section 1: random background ----------------
-
-   Performance contract: backgrounds.json is a tiny manifest of
-   filenames + credits (generated from the Backgrounds/ folder).
-   The page downloads the manifest (~5 KB) and exactly ONE image.
-   Randomness happens over metadata, so loading one photo never
-   means loading fifty. */
+/* ---------------- Section 1: random background ---------------- */
 
 (function () {
   var PICKED = false; // one pick per page load; persists across all view changes
@@ -56,45 +51,27 @@
     .catch(fallback); /* file:// or offline: soft grey background */
 })();
 
-/* ---------------- Section 2: course selection + sample loop ----------------
-   Sample question banks live here for now; generate.py will replace them
-   with content/<course>/*.json. One course = one bank, cycled in order. */
+/* ---------------- Section 2: content loading ---------------- */
 
-var BANKS = {
-  "1ZA3": [
-    {
-      q: "Compute $AB$ where $$A = \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}, \\qquad B = \\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix}.$$",
-      a: "$$AB = \\begin{pmatrix} 2 & 1 \\\\ 4 & 3 \\end{pmatrix}$$ Multiply each row of $A$ into each column of $B$; since $BA = \\begin{pmatrix} 3 & 4 \\\\ 1 & 2 \\end{pmatrix} \\neq AB$, matrix multiplication is not commutative."
-    },
-    {
-      q: "Compute $AB$ where $$A = \\begin{pmatrix} 2 & 0 \\\\ 1 & 3 \\end{pmatrix}, \\qquad B = \\begin{pmatrix} 1 & 1 \\\\ 0 & 2 \\end{pmatrix}.$$",
-      a: "$$AB = \\begin{pmatrix} 2 & 2 \\\\ 1 & 7 \\end{pmatrix}$$ Row 1: $(2{\\cdot}1{+}0{\\cdot}0,\\ 2{\\cdot}1{+}0{\\cdot}2)$. Row 2: $(1{\\cdot}1{+}3{\\cdot}0,\\ 1{\\cdot}1{+}3{\\cdot}2)$."
-    }
-  ],
-  "1ZC3": [
-    {
-      q: "Differentiate $f(x) = x^2 \\sin x$.",
-      a: "$$f'(x) = 2x\\sin x + x^2\\cos x$$ By the product rule: $(x^2)'\\sin x + x^2(\\sin x)'$."
-    },
-    {
-      q: "Differentiate $f(x) = e^{3x} \\cos x$.",
-      a: "$$f'(x) = 3e^{3x}\\cos x - e^{3x}\\sin x$$ Product rule with $(e^{3x})' = 3e^{3x}$ and $(\\cos x)' = -\\sin x$."
-    }
-  ]
-};
+var INDEX = null;   // content/index.json
+var BANK = null;    // current course's question array
 
-var showView = (function () {
-  var select = document.querySelector('[data-view="select"]');
-  var question = document.querySelector('[data-view="question"]');
-  var btnBack = document.getElementById("btn-back");
-  return function (name) {
-    select.hidden = name !== "select";
-    question.hidden = name !== "question";
-    btnBack.hidden = name !== "question"; // Back lives in the header, question view only
-  };
-})();
+function loadJSON(url) {
+  // cache: "no-cache" revalidates with the server every time, so edited
+  // question banks show up on plain reloads during development.
+  return fetch(url, { cache: "no-cache" }).then(function (r) {
+    if (!r.ok) throw new Error(r.status);
+    return r.json();
+  });
+}
 
-/* KaTeX typesetting */
+function loadCourse(courseId) {
+  var course = INDEX.courses.filter(function (c) { return c.id === courseId; })[0];
+  return loadJSON(course.bank);
+}
+
+/* ---------------- Section 3: KaTeX ---------------- */
+
 function typeset(el) {
   if (window.renderMathInElement) {
     renderMathInElement(el, {
@@ -107,52 +84,167 @@ function typeset(el) {
   }
 }
 
-/* Question state: which course, which question in its bank */
-var current = { course: null, idx: 0, revealed: false };
+/* ---------------- Section 4: views ---------------- */
 
-var btnMain = document.getElementById("btn-main");
+var showView = (function () {
+  var select = document.querySelector('[data-view="select"]');
+  var question = document.querySelector('[data-view="question"]');
+  var btnBack = document.getElementById("btn-back");
+  return function (name) {
+    select.hidden = name !== "select";
+    question.hidden = name !== "question";
+    btnBack.hidden = name !== "question";
+  };
+})();
+
+/* ---------------- Section 5: answer checking ----------------
+
+   Correct  = |user - value| <= max(value * tolerance, 1e-9) AND unit matches.
+   Wrong    = retry in place, no answer given (hints/reveal come later).
+   Numerics near zero use the absolute floor. */
+
+function checkNumeric(userValue, answer) {
+  var v = parseFloat(userValue);
+  if (isNaN(v)) return false;
+  var tol = Math.max(answer.value * answer.tolerance, 1e-9);
+  return Math.abs(v - answer.value) <= tol;
+}
+
+/* ---------------- Section 6: the loop ----------------
+
+   question → Check → correct: solution shown, button = Next question
+                     wrong:   feedback, retry (solution link after 2 tries) */
+
+var current = null; // { idx, attempts, revealed }
+
+var qText = document.getElementById("q-text");
+var aInput = document.getElementById("a-input");
+var aUnit = document.getElementById("a-unit");
 var aBox = document.getElementById("a-box");
+var feedback = document.getElementById("feedback");
+var btnMain = document.getElementById("btn-main");
 
-function loadQuestion(course, idx) {
-  current = { course: course, idx: idx, revealed: false };
-  var qt = document.getElementById("q-text");
-  qt.textContent = BANKS[course][idx].q;
-  typeset(qt);
+function loadQuestion(idx) {
+  current = { idx: idx, attempts: 0, revealed: false };
+  var q = BANK[idx];
+  qText.textContent = q.prompt;
+  typeset(qText);
+  // unit dropdown: one global mechanics unit list from the manifest,
+  // starting with an unselected "Select unit" placeholder so the
+  // student makes an explicit choice
+  aUnit.innerHTML =
+    '<option value="" disabled selected>Select unit</option>' +
+    INDEX.units.map(function (u) {
+      return '<option value="' + u + '">' + u + "</option>";
+    }).join("");
+  aInput.value = "";
+  aInput.disabled = false;
+  aUnit.disabled = false;
   aBox.hidden = true;
   aBox.innerHTML = "";
-  btnMain.textContent = "Show answer";
+  feedback.hidden = true;
+  btnMain.textContent = "Check answer";
   showView("question");
 }
 
-btnMain.addEventListener("click", function () {
-  if (!current.course) return;
-  if (!current.revealed) {
-    aBox.innerHTML = BANKS[current.course][current.idx].a;
-    typeset(aBox);
-    aBox.hidden = false;
-    btnMain.textContent = "Next question";
-    current.revealed = true;
-  } else {
-    var bank = BANKS[current.course];
-    loadQuestion(current.course, (current.idx + 1) % bank.length);
+function showSolution() {
+  var q = BANK[current.idx];
+  current.revealed = true;
+  // No solution field in the bank yet — reveal states the correct
+  // answer so a stuck student can at least unblock themselves.
+  aBox.textContent = "The correct answer is " + q.answer.value + " " + q.answer.unit + ".";
+  typeset(aBox);
+  aBox.hidden = false;
+  aInput.disabled = true;
+  aUnit.disabled = true;
+  btnMain.textContent = "Next question";
+}
+
+function onMainButton() {
+  if (!current) return;
+  if (current.revealed) { // Next question
+    var next = Math.floor(Math.random() * BANK.length);
+    if (BANK.length > 1) {
+      while (next === current.idx) next = Math.floor(Math.random() * BANK.length);
+    }
+    loadQuestion(next);
+    return;
   }
+  // Check answer: unit must be actively chosen, then value+unit must match
+  if (aUnit.value === "") {
+    feedback.textContent = "Select a unit first.";
+    feedback.className = "feedback bad";
+    feedback.hidden = false;
+    return;
+  }
+  var q = BANK[current.idx];
+  var ok = checkNumeric(aInput.value, q.answer) &&
+           aUnit.value === q.answer.unit;
+  current.attempts++;
+  if (ok) {
+    feedback.textContent = "Correct.";
+    feedback.className = "feedback good";
+    feedback.hidden = false;
+    aInput.disabled = true;
+    aUnit.disabled = true;
+    showSolution(); // learning: always show the worked solution, even on success
+  } else {
+    feedback.textContent = current.attempts >= 2
+      ? "Still not quite. Check your units and rounding — or take a look below."
+      : "Not quite. Check your work and try again.";
+    feedback.className = "feedback bad";
+    feedback.hidden = false;
+    if (current.attempts >= 2) btnMain.textContent = "Reveal solution";
+  }
+}
+
+/* "Reveal solution" after 2 failed tries swaps the button's role */
+btnMain.addEventListener("click", function () {
+  if (!current) return;
+  if (!current.revealed && current.attempts >= 2) showSolution();
+  else onMainButton();
 });
 
-/* Bookmarks start the loop */
-(function () {
-  var bookmarks = document.querySelectorAll(".bookmark");
-  bookmarks.forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      bookmarks.forEach(function (b) {
-        b.classList.toggle("is-active", b === btn);
-        b.setAttribute("aria-pressed", b === btn ? "true" : "false");
-      });
-      loadQuestion(btn.dataset.course, 0);
-    });
-  });
-})();
+aInput.addEventListener("keydown", function (e) {
+  if (e.key === "Enter") btnMain.click();
+});
 
-/* Back: return to course selection */
+/* ---------------- Section 7: selection + boot ---------------- */
+
+function renderBookmarks() {
+  var row = document.getElementById("course-bookmarks");
+  row.innerHTML = "";
+  INDEX.courses.forEach(function (c) {
+    var parts = c.label.split("•");
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "bookmark";
+    btn.dataset.course = c.id;
+    btn.innerHTML =
+      '<span class="bookmark-label">' + parts[0].trim() +
+      ' <span class="dot">•</span> ' + parts[1].trim() + "</span>";
+    btn.addEventListener("click", function () {
+      loadCourse(c.id).then(function (bank) {
+        BANK = bank;
+        loadQuestion(Math.floor(Math.random() * bank.length));
+      });
+    });
+    row.appendChild(btn);
+  });
+}
+
 document.getElementById("btn-back").addEventListener("click", function () {
   showView("select");
 });
+
+loadJSON("content/index.json")
+  .then(function (index) {
+    INDEX = index;
+    renderBookmarks();
+    showView("select");
+  })
+  .catch(function () {
+    // Content unavailable (file:// or offline): show nothing selectable.
+    document.getElementById("course-bookmarks").innerHTML =
+      '<p class="footnote">Question banks could not be loaded.</p>';
+  });

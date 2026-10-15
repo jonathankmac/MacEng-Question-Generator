@@ -1,0 +1,41 @@
+[
+  {
+    "id": "kin-projectile-1",
+    "tags": [
+      "kinematics",
+      "projectile motion"
+    ],
+    "prompt": "A ball is launched horizontally at $5\\,\\mathrm{m/s}$ from a $20\\,\\mathrm{m}$ cliff. How far from the base of the cliff does it land? (Use $g = 9.8\\,\\mathrm{m/s^2}$.)",
+    "answer": {
+      "value": 10.1,
+      "tolerance": 0.05,
+      "unit": "m"
+    }
+  },
+  {
+    "id": "dyn-newton-1",
+    "tags": [
+      "dynamics",
+      "newton's laws"
+    ],
+    "prompt": "A $2\\,\\mathrm{kg}$ block on a frictionless table is pulled by a $10\\,\\mathrm{N}$ horizontal force. What is its speed after $3\\,\\mathrm{s}$, starting from rest?",
+    "answer": {
+      "value": 15,
+      "tolerance": 0.05,
+      "unit": "m/s"
+    }
+  },
+  {
+    "id": "mom-impulse-1",
+    "tags": [
+      "momentum",
+      "impulse"
+    ],
+    "prompt": "A $3\\,\\mathrm{kg}$ cart moving at $4\\,\\mathrm{m/s}$ is brought to rest in $0.5\\,\\mathrm{s}$. What is the magnitude of the average force applied?",
+    "answer": {
+      "value": 24,
+      "tolerance": 0.05,
+      "unit": "N"
+    }
+  }
+]

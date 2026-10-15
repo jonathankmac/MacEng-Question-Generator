@@ -274,6 +274,48 @@ button {
   white-space: pre-line;
 }
 
+.answer-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.answer-row input,
+.answer-row select {
+  font: inherit;
+  font-size: 17px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  min-height: 44px;
+}
+
+.answer-row input { flex: 1; }
+.answer-row select { flex: 0 0 auto; }
+
+.answer-row input:focus,
+.answer-row select:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+  border-color: var(--maroon);
+}
+
+.answer-row input:disabled,
+.answer-row select:disabled {
+  background: var(--bg);
+  color: var(--grey);
+}
+
+.feedback {
+  margin: 10px 0 0;
+  font-size: 15px;
+}
+
+.feedback.bad { color: var(--maroon); }
+.feedback.good { color: var(--grey); }
+
 .a-box {
   margin-top: 18px;
   padding-top: 16px;

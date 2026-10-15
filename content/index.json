@@ -1,0 +1,10 @@
+{
+  "units": ["m", "cm", "mm", "km", "s", "m/s", "km/h", "m/s^2", "N", "kg", "g", "J", "W", "N·s", "kg·m/s"],
+  "courses": [
+    {
+      "id": "1D03",
+      "label": "PHYSICS 1D03 • Mechanics",
+      "bank": "content/1D03/questions.json"
+    }
+  ]
+}

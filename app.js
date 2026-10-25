@@ -284,6 +284,91 @@ document.getElementById("btn-back").addEventListener("click", function () {
   showView("select");
 });
 
+/* ---------------- Section 8: accounts (Step 1) ----------------
+
+   Supabase magic-link auth. The session (null or a user object) is
+   the single source of truth; one render function derives the whole
+   auth slot's UI from it. Anonymous practice is never gated. */
+
+var SUPABASE_URL = "https://ixmodvcdksdlzgulksar.supabase.co";
+var SUPABASE_KEY = "sb_publishable_MElxhK9152H_Ly1SvU97vg_zbZP-Jdw";
+
+var authArea = document.getElementById("auth-area");
+var session = null; // null = anonymous; object = signed in
+
+function renderAuth() {
+  if (session) {
+    authArea.innerHTML =
+      '<span class="auth-chip">Signed in as ' + session.user.email + '</span>' +
+      '<button type="button" class="auth-link" id="btn-signout">Sign out</button>';
+    document.getElementById("btn-signout").addEventListener("click", function () {
+      window.sb.auth.signOut();
+    });
+  } else {
+    authArea.innerHTML =
+      '<button type="button" class="auth-link" id="btn-signin">Sign in to save progress</button>' +
+      '<form class="auth-form" id="auth-form" hidden>' +
+      '<input id="auth-email" type="email" placeholder="you@example.com" autocomplete="email">' +
+      '<button type="submit" class="btn-mini">Send sign-in link</button>' +
+      "</form>" +
+      '<p class="auth-msg" id="auth-msg" hidden></p>';
+    document.getElementById("btn-signin").addEventListener("click", function () {
+      document.getElementById("auth-form").hidden = false;
+      document.getElementById("auth-email").focus();
+    });
+    document.getElementById("auth-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var email = document.getElementById("auth-email").value.trim();
+      var msg = document.getElementById("auth-msg");
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        msg.textContent = "Please enter a valid email address.";
+        msg.hidden = false;
+        return;
+      }
+      msg.textContent = "Sending…";
+      msg.hidden = false;
+      window.sb.auth.signInWithOtp({
+        email: email,
+        options: { emailRedirectTo: location.origin + location.pathname }
+      }).then(function (result) {
+        if (result.error) {
+          msg.textContent = "Couldn't send the link: " + result.error.message;
+        } else {
+          document.getElementById("auth-form").hidden = true;
+          msg.textContent = "Check your email — the sign-in link is on its way.";
+        }
+      });
+    });
+  }
+}
+
+function setSession(newSession) {
+  session = newSession;
+  renderAuth();
+}
+
+// Init only if the SDK loaded (offline/file:// must not break the site).
+if (window.supabase && window.supabase.createClient) {
+  window.sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  window.sb.auth.getSession().then(function (res) {
+    setSession(res.data.session); // restore an existing sign-in on reload
+  });
+  window.sb.auth.onAuthStateChange(function (_event, newSession) {
+    setSession(newSession); // fires on sign-in via email link, sign-out, refresh
+  });
+}
+// Init only if the SDK loaded (offline/file:// must not break the site).
+if (window.supabase && window.supabase.createClient) {
+  window.sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  window.sb.auth.getSession().then(function (res) {
+    setSession(res.data.session); // restore an existing sign-in on reload
+  });
+  window.sb.auth.onAuthStateChange(function (_event, newSession) {
+    setSession(newSession); // fires on sign-in via email link, sign-out, refresh
+  });
+}
+// If the SDK never loaded, auth-area stays empty and practice works as always.
+
 loadJSON("content/index.json")
   .then(function (index) {
     INDEX = index;

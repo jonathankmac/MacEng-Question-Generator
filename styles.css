@@ -348,6 +348,77 @@ button {
   padding: 2px 0;
 }
 
+/* ---------- auth slot (state-driven: one element, different contents) ---------- */
+
+.auth-area {
+  margin-top: 22px;
+  text-align: center;
+}
+
+.auth-link {
+  min-height: 44px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.25);
+  text-underline-offset: 3px;
+  transition: color var(--fast) ease, text-decoration-color var(--fast) ease;
+}
+
+.auth-link:hover {
+  color: var(--gold);
+  text-decoration-color: var(--gold);
+}
+
+.auth-form {
+  display: flex;
+  gap: 10px;
+  max-width: 440px;
+  margin: 12px auto 0;
+}
+
+.auth-form input {
+  flex: 1;
+  font: inherit;
+  font-size: 15px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  min-height: 44px;
+}
+
+.btn-mini {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 0 16px;
+  min-height: 44px;
+  color: #FFFFFF;
+  background: var(--maroon);
+  border-radius: var(--radius);
+  transition: background-color var(--fast) ease;
+}
+
+.btn-mini:hover { background: var(--maroon-shade); }
+
+.auth-msg {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.auth-chip {
+  display: inline-block;
+  font-size: 13px;
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.85);
+  margin-right: 8px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .view, .bookmark, .bg, .btn-main, .a-box {
     animation: none;

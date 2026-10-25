@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <title>MacEng Practice</title>
+<!-- Supabase JS SDK (auth + database client) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- KaTeX for math rendering (used by the question view, to be rebuilt) -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
@@ -40,7 +42,9 @@
       </button>
     </div>
 
-      </section>
+    <!-- auth slot: renders differently based on session state -->
+    <div class="auth-area" id="auth-area"></div>
+  </section>
 
   <!-- QUESTION → CHECK → NEXT -->
   <section class="view" data-view="question" hidden>

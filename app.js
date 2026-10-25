@@ -361,7 +361,9 @@ function renderAuth() {
 }
 
 function setSession(newSession) {
+  var hadSession = !!session;
   session = newSession;
+  if (session && !hadSession) pushLocalOnce(); // signed in just now: upload anonymous-era rows
   renderAuth();
 }
 
@@ -386,6 +388,56 @@ if (window.supabase && window.supabase.createClient) {
   });
 }
 // If the SDK never loaded, auth-area stays empty and practice works as always.
+
+/* ---------------- Section 9: pushLocalOnce (Step 3a) ----------------
+
+   One-way transport, not conflict resolution: the log is append-only,
+   so the only question is "which local rows has the cloud never seen?"
+   Merge rule: cloud wins; local pushes only what's missing. Runs once
+   per sign-in, fire-and-forget. */
+
+function pushLocalOnce() {
+  var local = [];
+  try { local = JSON.parse(localStorage.getItem(ANSWER_LOG_KEY)) || []; }
+  catch (e) { local = []; }
+  if (local.length === 0) return;
+
+  window.sb.from("answer_log")
+    .select("variant_id, submitted_value, correct, revealed, created_at")
+    .then(function (res) {
+      if (res.error) { console.warn("Push skipped (read failed):", res.error.message); return; }
+      // What the cloud already has, as comparable signatures. Local ts
+      // (ms) vs cloud created_at: match within ±2 seconds (the DB stamps
+      // created_at just after our client-side ts), same variant required.
+      var cloudByVariant = {};
+      res.data.forEach(function (row) {
+        var sec = Math.round(new Date(row.created_at).getTime() / 1000);
+        (cloudByVariant[row.variant_id] = cloudByVariant[row.variant_id] || []).push(sec);
+      });
+      var missing = local.filter(function (e) {
+        var secs = cloudByVariant[e.variant_id] || [];
+        var ls = Math.floor(e.ts / 1000);
+        return !secs.some(function (cs) { return Math.abs(cs - ls) <= 2; });
+      });
+      if (missing.length === 0) return;
+
+      var rows = missing.map(function (e) {
+        return {
+          user_id: session.user.id,
+          variant_id: e.variant_id,
+          submitted_value: e.submitted_value,
+          unit: e.unit,
+          correct: e.correct,
+          revealed: e.revealed,
+          created_at: new Date(e.ts).toISOString() // preserve WHEN it happened
+        };
+      });
+      window.sb.from("answer_log").insert(rows).then(function (res2) {
+        if (res2.error) console.warn("Push failed:", res2.error.message);
+        // no local cleanup: the log stays as this device's cache
+      });
+    });
+}
 
 loadJSON("content/index.json")
   .then(function (index) {

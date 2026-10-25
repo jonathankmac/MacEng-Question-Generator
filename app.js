@@ -130,6 +130,24 @@ function recordAnswer(event) {
     localStorage.setItem(ANSWER_LOG_KEY, JSON.stringify(log));
   } catch (e) { /* private mode / quota full: lose one record, never break the loop */ }
 
+  // Write-through: when signed in, the same event also goes to the cloud.
+  // Fire-and-forget — a network failure must never break the question
+  // loop, and the local copy is always there. RLS stamps ownership:
+  // with check (auth.uid() = user_id) makes a forged user_id impossible.
+  if (session && window.sb) {
+    window.sb.from("answer_log").insert({
+      user_id: session.user.id,
+      variant_id: event.variant_id,
+      submitted_value: event.submitted_value,
+      unit: event.unit,
+      correct: event.correct,
+      revealed: event.revealed
+    }).then(function (res) {
+      if (res.error) {
+        // Keep the app working; surface for debugging in the console.
+        console.warn("Cloud save failed:", res.error.message);
+      }
+    });
   }
 }
 

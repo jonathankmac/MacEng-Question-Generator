@@ -110,6 +110,35 @@ function checkNumeric(userValue, answer) {
   return Math.abs(v - answer.value) <= tol;
 }
 
+/* ---------------- Section 5b: answer history (Step 0) ----------------
+
+   Event log: one row per check-button press, plus one per reveal.
+   Stored under a single localStorage key as a JSON array. Raw events
+   only — stats (accuracy, weak topics) are derived later, and cloud
+   sync (Step 2) will duplicate writes, not change this contract. */
+
+var ANSWER_LOG_KEY = "answer_log";
+
+function recordAnswer(event) {
+  var log;
+  try {
+    log = JSON.parse(localStorage.getItem(ANSWER_LOG_KEY)) || [];
+  } catch (e) { log = []; }
+  event.ts = Date.now();
+  log.push(event);
+  try {
+    localStorage.setItem(ANSWER_LOG_KEY, JSON.stringify(log));
+  } catch (e) { /* private mode / quota full: lose one record, never break the loop */ }
+
+  }
+}
+
+function getTopicStats() {
+  // Deliberately unimplemented (Step 0 scope): derivation of per-tag
+  // accuracy arrives with the stats UI. Contract: returns null for now.
+  return null;
+}
+
 /* ---------------- Section 6: the loop ----------------
 
    question → Check → correct: solution shown, button = Next question
@@ -147,9 +176,20 @@ function loadQuestion(idx) {
   showView("question");
 }
 
-function showSolution() {
+function showSolution(gaveUp) {
   var q = BANK[current.idx];
   current.revealed = true;
+  // Log the "gave up" event only when the student revealed without
+  // solving — the success path must not pollute the log.
+  if (gaveUp) {
+    recordAnswer({
+      variant_id: q.id,
+      submitted_value: null,
+      unit: null,
+      correct: false,
+      revealed: true
+    });
+  }
   // No solution field in the bank yet — reveal states the correct
   // answer so a stuck student can at least unblock themselves.
   aBox.textContent = "The correct answer is " + q.answer.value + " " + q.answer.unit + ".";
@@ -181,6 +221,13 @@ function onMainButton() {
   var ok = checkNumeric(aInput.value, q.answer) &&
            aUnit.value === q.answer.unit;
   current.attempts++;
+  recordAnswer({
+    variant_id: q.id,
+    submitted_value: parseFloat(aInput.value),
+    unit: aUnit.value,
+    correct: ok,
+    revealed: false
+  });
   if (ok) {
     feedback.textContent = "Correct.";
     feedback.className = "feedback good";
@@ -201,7 +248,7 @@ function onMainButton() {
 /* "Reveal solution" after 2 failed tries swaps the button's role */
 btnMain.addEventListener("click", function () {
   if (!current) return;
-  if (!current.revealed && current.attempts >= 2) showSolution();
+  if (!current.revealed && current.attempts >= 2) showSolution(true);
   else onMainButton();
 });
 

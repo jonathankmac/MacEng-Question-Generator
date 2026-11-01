@@ -1,5 +1,5 @@
 /* ============================================================
-   MacEng Practice â€” app.js
+   MacEng Practice — app.js
    Section 1: random background (one image via manifest).
    Section 2: course selection + question/answer-check loop.
    Questions are served from content/*.json banks; answers are
@@ -21,7 +21,7 @@
 
   function apply(entry) {
     PICKED = true;
-    // Preload the single image, then fade it in when ready â€”
+    // Preload the single image, then fade it in when ready —
     // avoids painting a half-downloaded background. If it never
     // arrives, fall back to the soft grey background.
     var img = new Image();
@@ -34,7 +34,7 @@
       bg.style.opacity = "1";
       if (credit && text) {
         var who = entry.photographer ? "Photo: " + entry.photographer : "Photo: unknown";
-        text.textContent = who + " Â· " + entry.location;
+        text.textContent = who + " · " + entry.location;
         credit.hidden = false;
       }
     };
@@ -97,9 +97,32 @@ var showView = (function () {
   };
 })();
 
-/* ---------------- Section 5: answer checking ----------------
+/* ---------------- Section 5: answer parsing + checking ----------------
 
-   Correct  = |user - value| <= max(value * tolerance, 1e-9) AND unit matches.
+   One input field carries the number and the unit together ("10.1 m").
+   Parsing is deliberately forgiving on format, strict on comparison:
+   superscripts and stray spacing are normalized, then the unit must
+   match the expected one exactly. */
+
+function normalizeUnit(u) {
+  return u.replace(/\s+/g, "")
+    .replace(/²/g, "^2").replace(/³/g, "^3")
+    .replace(/\*/g, "·");
+}
+
+function parseAnswer(text) {
+  var t = text.trim().replace(/\s+/g, " ");
+  var NUM = "[+-]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][+-]?\\d+)?";
+  // number + unit (unit must start with a non-digit: "10.1 m", "10.1m")
+  var m = t.match(new RegExp("^(" + NUM + ")\\s*([^\\d\\s].*)$"));
+  if (m) return { value: parseFloat(m[1]), unit: normalizeUnit(m[5]) };
+  // bare number ("15") -> valid value, missing unit
+  var n = t.match(new RegExp("^(" + NUM + ")$"));
+  if (n) return { value: parseFloat(n[1]), unit: "" };
+  return { value: NaN, unit: "" };
+}
+
+/* Correct  = |user - value| <= max(value * tolerance, 1e-9) AND unit matches.
    Wrong    = retry in place, no answer given (hints/reveal come later).
    Numerics near zero use the absolute floor. */
 
@@ -114,7 +137,7 @@ function checkNumeric(userValue, answer) {
 
    Event log: one row per check-button press, plus one per reveal.
    Stored under a single localStorage key as a JSON array. Raw events
-   only â€” stats (accuracy, weak topics) are derived later, and cloud
+   only — stats (accuracy, weak topics) are derived later, and cloud
    sync (Step 2) will duplicate writes, not change this contract. */
 
 var ANSWER_LOG_KEY = "answer_log";
@@ -131,7 +154,7 @@ function recordAnswer(event) {
   } catch (e) { /* private mode / quota full: lose one record, never break the loop */ }
 
   // Write-through: when signed in, the same event also goes to the cloud.
-  // Fire-and-forget â€” a network failure must never break the question
+  // Fire-and-forget — a network failure must never break the question
   // loop, and the local copy is always there. RLS stamps ownership:
   // with check (auth.uid() = user_id) makes a forged user_id impossible.
   if (session && window.sb) {
@@ -150,6 +173,20 @@ function recordAnswer(event) {
     });
   }
 }
+
+/* ---------------- Section 5c: tag stats (getTopicStats) ----------------
+
+   Pure derivation over the event log: fold events into per-question
+   states, then aggregate weighted "load" per tag.
+
+   Event → visit: sorted by ts, grouped by variant; a visit ends at a
+   correct or revealed event. A variant's status = its LATEST visit,
+   completed iff that visit's FIRST check was correct.
+
+   Tag load = Σ weight(t) over visited variants whose latest visit is
+   not completed. Completed questions contribute nothing (backlog
+   metric, not a grade). Unvisited variants are invisible. Events from
+   before the weighted-tag schema carry no tags and are skipped. */
 
 function getTopicStats(events) {
   if (!events || events.length === 0) return null;
@@ -197,18 +234,15 @@ function getTopicStats(events) {
     load[f.tag] = (load[f.tag] || 0) + f.w;
   });
   return load;
-}
+}/* ---------------- Section 6: the loop ----------------
 
-/* ---------------- Section 6: the loop ----------------
-
-   question â†’ Check â†’ correct: solution shown, button = Next question
+   question → Check → correct: solution shown, button = Next question
                      wrong:   feedback, retry (solution link after 2 tries) */
 
 var current = null; // { idx, attempts, revealed }
 
 var qText = document.getElementById("q-text");
 var aInput = document.getElementById("a-input");
-var aUnit = document.getElementById("a-unit");
 var aBox = document.getElementById("a-box");
 var feedback = document.getElementById("feedback");
 var btnMain = document.getElementById("btn-main");
@@ -218,17 +252,8 @@ function loadQuestion(idx) {
   var q = BANK[idx];
   qText.textContent = q.prompt;
   typeset(qText);
-  // unit dropdown: one global mechanics unit list from the manifest,
-  // starting with an unselected "Select unit" placeholder so the
-  // student makes an explicit choice
-  aUnit.innerHTML =
-    '<option value="" disabled selected>Select unit</option>' +
-    INDEX.units.map(function (u) {
-      return '<option value="' + u + '">' + u + "</option>";
-    }).join("");
   aInput.value = "";
   aInput.disabled = false;
-  aUnit.disabled = false;
   aBox.hidden = true;
   aBox.innerHTML = "";
   feedback.hidden = true;
@@ -240,7 +265,7 @@ function showSolution(gaveUp) {
   var q = BANK[current.idx];
   current.revealed = true;
   // Log the "gave up" event only when the student revealed without
-  // solving â€” the success path must not pollute the log.
+  // solving — the success path must not pollute the log.
   if (gaveUp) {
     recordAnswer({
       variant_id: q.id,
@@ -251,13 +276,12 @@ function showSolution(gaveUp) {
       tags: q.tags
     });
   }
-  // No solution field in the bank yet â€” reveal states the correct
+  // No solution field in the bank yet — reveal states the correct
   // answer so a stuck student can at least unblock themselves.
   aBox.textContent = "The correct answer is " + q.answer.value + " " + q.answer.unit + ".";
   typeset(aBox);
   aBox.hidden = false;
   aInput.disabled = true;
-  aUnit.disabled = true;
   btnMain.textContent = "Next question";
 }
 
@@ -271,40 +295,52 @@ function onMainButton() {
     loadQuestion(next);
     return;
   }
-  // Check answer: unit must be actively chosen, then value+unit must match
-  if (aUnit.value === "") {
-    feedback.textContent = "Select a unit first.";
-    feedback.className = "feedback bad";
-    feedback.hidden = false;
-    return;
-  }
+  // Check answer: parse "number + unit" from the one field, then grade
   var q = BANK[current.idx];
-  var ok = checkNumeric(aInput.value, q.answer) &&
-           aUnit.value === q.answer.unit;
+  var parsed = parseAnswer(aInput.value);
+  var ok;
+  if (isNaN(parsed.value)) {
+    ok = false;
+    feedback.textContent = "Enter a number with its unit — e.g. 10.1 m.";
+  } else if (!parsed.unit) {
+    ok = false;
+    feedback.textContent = "Include a unit — e.g. 10.1 m.";
+  } else {
+    var numOk = checkNumeric(parsed.value, q.answer);
+    var unitOk = parsed.unit === normalizeUnit(q.answer.unit);
+    ok = numOk && unitOk;
+    if (ok) {
+      feedback.textContent = "Correct.";
+      feedback.className = "feedback good";
+      feedback.hidden = false;
+      aInput.disabled = true;
+      showSolution(); // learning: always show the worked solution, even on success
+      recordAnswer({
+        variant_id: q.id,
+        submitted_value: parsed.value,
+        unit: parsed.unit,
+        correct: true,
+        revealed: false,
+        tags: q.tags
+      });
+      return;
+    }
+    feedback.textContent = numOk
+      ? "Not quite — check your units."
+      : "Not quite. Check your work and try again.";
+  }
+  feedback.className = "feedback bad";
+  feedback.hidden = false;
   current.attempts++;
   recordAnswer({
     variant_id: q.id,
-    submitted_value: parseFloat(aInput.value),
-    unit: aUnit.value,
-    correct: ok,
+    submitted_value: isNaN(parsed.value) ? null : parsed.value,
+    unit: parsed.unit || null,
+    correct: false,
     revealed: false,
     tags: q.tags
   });
-  if (ok) {
-    feedback.textContent = "Correct.";
-    feedback.className = "feedback good";
-    feedback.hidden = false;
-    aInput.disabled = true;
-    aUnit.disabled = true;
-    showSolution(); // learning: always show the worked solution, even on success
-  } else {
-    feedback.textContent = current.attempts >= 2
-      ? "Still not quite. Check your units and rounding â€” or take a look below."
-      : "Not quite. Check your work and try again.";
-    feedback.className = "feedback bad";
-    feedback.hidden = false;
-    if (current.attempts >= 2) btnMain.textContent = "Reveal solution";
-  }
+  if (current.attempts >= 2) btnMain.textContent = "Reveal solution";
 }
 
 /* "Reveal solution" after 2 failed tries swaps the button's role */
@@ -324,14 +360,14 @@ function renderBookmarks() {
   var row = document.getElementById("course-bookmarks");
   row.innerHTML = "";
   INDEX.courses.forEach(function (c) {
-    var parts = c.label.split("â€¢");
+    var parts = c.label.split("•");
     var btn = document.createElement("button");
     btn.type = "button";
     btn.className = "bookmark";
     btn.dataset.course = c.id;
     btn.innerHTML =
       '<span class="bookmark-label">' + parts[0].trim() +
-      ' <span class="dot">â€¢</span> ' + parts[1].trim() + "</span>";
+      ' <span class="dot">•</span> ' + parts[1].trim() + "</span>";
     btn.addEventListener("click", function () {
       loadCourse(c.id).then(function (bank) {
         BANK = bank;
@@ -387,7 +423,7 @@ function renderAuth() {
         msg.hidden = false;
         return;
       }
-      msg.textContent = "Sendingâ€¦";
+      msg.textContent = "Sending…";
       msg.hidden = false;
       window.sb.auth.signInWithOtp({
         email: email,
@@ -397,7 +433,7 @@ function renderAuth() {
           msg.textContent = "Couldn't send the link: " + result.error.message;
         } else {
           document.getElementById("auth-form").hidden = true;
-          msg.textContent = "Check your email â€” the sign-in link is on its way.";
+          msg.textContent = "Check your email — the sign-in link is on its way.";
         }
       });
     });
@@ -451,7 +487,7 @@ function pushLocalOnce() {
     .then(function (res) {
       if (res.error) { console.warn("Push skipped (read failed):", res.error.message); return; }
       // What the cloud already has, as comparable signatures. Local ts
-      // (ms) vs cloud created_at: match within Â±2 seconds (the DB stamps
+      // (ms) vs cloud created_at: match within ±2 seconds (the DB stamps
       // created_at just after our client-side ts), same variant required.
       var cloudByVariant = {};
       res.data.forEach(function (row) {

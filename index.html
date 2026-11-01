@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600..700&display=swap">
-<link rel="stylesheet" href="styles.css?v=18">
+<link rel="stylesheet" href="styles.css?v=19">
 </head>
 <body>
 
@@ -24,7 +24,7 @@
 <div class="bg-scrim" aria-hidden="true"></div>
 
 <aside class="bg-credit" id="bg-credit" hidden>
-  <span id="bg-credit-text">Photo: â€”</span>
+  <span id="bg-credit-text">Photo: —</span>
 </aside>
 
 <header class="site-header">
@@ -38,7 +38,7 @@
   <section class="view" data-view="select">
     <div class="bookmark-row" id="course-bookmarks">
       <button type="button" class="bookmark" data-course="1D03">
-        <span class="bookmark-label">1D03 <span class="dot">â€¢</span> Physics</span>
+        <span class="bookmark-label">1D03 <span class="dot">•</span> Physics</span>
       </button>
     </div>
 
@@ -46,14 +46,13 @@
     <div class="auth-area" id="auth-area"></div>
   </section>
 
-  <!-- QUESTION â†’ CHECK â†’ NEXT -->
+  <!-- QUESTION → CHECK → NEXT -->
   <section class="view" data-view="question" hidden>
     <article class="card">
       <div class="q-text" id="q-text"><!-- question --></div>
       <div class="answer-row">
-        <input id="a-input" type="text" inputmode="decimal" autocomplete="off"
-               placeholder="Your answer" aria-label="Your numeric answer">
-        <select id="a-unit" aria-label="Unit"></select>
+        <input id="a-input" type="text" inputmode="text" autocomplete="off"
+               placeholder="e.g. 10.1 m" aria-label="Your answer, with units">
       </div>
       <p class="feedback" id="feedback" hidden></p>
       <div class="a-box" id="a-box" hidden><!-- worked solution --></div>
@@ -67,6 +66,6 @@
   Not affiliated with or endorsed by McMaster University.
 </footer>
 
-<script src="app.js?v=22"></script>
+<script src="app.js?v=24"></script>
 </body>
 </html>

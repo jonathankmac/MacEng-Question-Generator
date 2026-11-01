@@ -1,5 +1,5 @@
 /* ============================================================
-   MacEng Practice â€” styles
+   MacEng Practice — styles
    McMaster Heritage palette. Current scope: background, header,
    course bookmarks. Question/solution styles return later.
    ============================================================ */
@@ -249,7 +249,7 @@ button {
   transform: translateX(4px) scale(0.99);
 }
 
-/* hover: gold hairline inset â€” fleeting, not a persistent selected state */
+/* hover: gold hairline inset — fleeting, not a persistent selected state */
 .bookmark:hover::after {
   content: "";
   position: absolute;
@@ -258,7 +258,7 @@ button {
   pointer-events: none;
 }
 
-/* ---------- question â†’ answer (sample loop) ---------- */
+/* ---------- question → answer (sample loop) ---------- */
 
 .card {
   background: var(--surface);
@@ -275,13 +275,10 @@ button {
 }
 
 .answer-row {
-  display: flex;
-  gap: 10px;
   margin-top: 18px;
 }
 
-.answer-row input,
-.answer-row select {
+.answer-row input {
   font: inherit;
   font-size: 17px;
   padding: 10px 12px;
@@ -290,20 +287,16 @@ button {
   background: var(--surface);
   color: var(--ink);
   min-height: 44px;
+  width: 100%;
 }
 
-.answer-row input { flex: 1; }
-.answer-row select { flex: 0 0 auto; }
-
-.answer-row input:focus,
-.answer-row select:focus {
+.answer-row input:focus {
   outline: 2px solid var(--gold);
   outline-offset: 1px;
   border-color: var(--maroon);
 }
 
-.answer-row input:disabled,
-.answer-row select:disabled {
+.answer-row input:disabled {
   background: var(--bg);
   color: var(--grey);
 }

@@ -1,5 +1,5 @@
 /* ============================================================
-   MacEng Practice — styles
+   MacEng Practice â€” styles
    McMaster Heritage palette. Current scope: background, header,
    course bookmarks. Question/solution styles return later.
    ============================================================ */
@@ -249,7 +249,7 @@ button {
   transform: translateX(4px) scale(0.99);
 }
 
-/* hover: gold hairline inset — fleeting, not a persistent selected state */
+/* hover: gold hairline inset â€” fleeting, not a persistent selected state */
 .bookmark:hover::after {
   content: "";
   position: absolute;
@@ -258,7 +258,7 @@ button {
   pointer-events: none;
 }
 
-/* ---------- question → answer (sample loop) ---------- */
+/* ---------- question â†’ answer (sample loop) ---------- */
 
 .card {
   background: var(--surface);

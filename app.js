@@ -1,5 +1,5 @@
 /* ============================================================
-   MacEng Practice — app.js
+   MacEng Practice â€” app.js
    Section 1: random background (one image via manifest).
    Section 2: course selection + question/answer-check loop.
    Questions are served from content/*.json banks; answers are
@@ -21,7 +21,7 @@
 
   function apply(entry) {
     PICKED = true;
-    // Preload the single image, then fade it in when ready —
+    // Preload the single image, then fade it in when ready â€”
     // avoids painting a half-downloaded background. If it never
     // arrives, fall back to the soft grey background.
     var img = new Image();
@@ -34,7 +34,7 @@
       bg.style.opacity = "1";
       if (credit && text) {
         var who = entry.photographer ? "Photo: " + entry.photographer : "Photo: unknown";
-        text.textContent = who + " · " + entry.location;
+        text.textContent = who + " Â· " + entry.location;
         credit.hidden = false;
       }
     };
@@ -114,7 +114,7 @@ function checkNumeric(userValue, answer) {
 
    Event log: one row per check-button press, plus one per reveal.
    Stored under a single localStorage key as a JSON array. Raw events
-   only — stats (accuracy, weak topics) are derived later, and cloud
+   only â€” stats (accuracy, weak topics) are derived later, and cloud
    sync (Step 2) will duplicate writes, not change this contract. */
 
 var ANSWER_LOG_KEY = "answer_log";
@@ -131,7 +131,7 @@ function recordAnswer(event) {
   } catch (e) { /* private mode / quota full: lose one record, never break the loop */ }
 
   // Write-through: when signed in, the same event also goes to the cloud.
-  // Fire-and-forget — a network failure must never break the question
+  // Fire-and-forget â€” a network failure must never break the question
   // loop, and the local copy is always there. RLS stamps ownership:
   // with check (auth.uid() = user_id) makes a forged user_id impossible.
   if (session && window.sb) {
@@ -151,15 +151,57 @@ function recordAnswer(event) {
   }
 }
 
-function getTopicStats() {
-  // Deliberately unimplemented (Step 0 scope): derivation of per-tag
-  // accuracy arrives with the stats UI. Contract: returns null for now.
-  return null;
+function getTopicStats(events) {
+  if (!events || events.length === 0) return null;
+
+  // Fold: variant → { tags, ordered events }
+  var byVariant = {};
+  events.slice().sort(function (a, b) { return a.ts - b.ts; }).forEach(function (e) {
+    if (!e.tags) return; // pre-weights schema event: unusable, skip
+    if (!byVariant[e.variant_id]) {
+      byVariant[e.variant_id] = { tags: e.tags, events: [] };
+    }
+    byVariant[e.variant_id].events.push(e);
+  });
+
+  // Per-variant: is the latest visit completed (first check correct)?
+  var failedWeighted = []; // [{ tags, failedWeight already 1 }], aggregated below
+  var anyCounted = false;
+  Object.keys(byVariant).forEach(function (vid) {
+    var v = byVariant[vid];
+    // cut visits
+    var visits = [];
+    var current = null;
+    v.events.forEach(function (e) {
+      if (!current) current = [];
+      current.push(e);
+      if (e.correct || e.revealed) { visits.push(current); current = null; }
+    });
+    if (current && current.length) visits.push(current); // unresolved tail = latest visit
+
+    var latest = visits[visits.length - 1];
+    var completed = latest[0].correct === true;
+    anyCounted = true;
+    if (completed) return; // weight irrelevant for completed questions
+
+    // failed: push its tag weights into the load
+    Object.keys(v.tags).forEach(function (t) {
+      var w = v.tags[t];
+      failedWeighted.push({ tag: t, w: w });
+    });
+  });
+
+  if (!anyCounted) return null;
+  var load = {};
+  failedWeighted.forEach(function (f) {
+    load[f.tag] = (load[f.tag] || 0) + f.w;
+  });
+  return load;
 }
 
 /* ---------------- Section 6: the loop ----------------
 
-   question → Check → correct: solution shown, button = Next question
+   question â†’ Check â†’ correct: solution shown, button = Next question
                      wrong:   feedback, retry (solution link after 2 tries) */
 
 var current = null; // { idx, attempts, revealed }
@@ -198,17 +240,18 @@ function showSolution(gaveUp) {
   var q = BANK[current.idx];
   current.revealed = true;
   // Log the "gave up" event only when the student revealed without
-  // solving — the success path must not pollute the log.
+  // solving â€” the success path must not pollute the log.
   if (gaveUp) {
     recordAnswer({
       variant_id: q.id,
       submitted_value: null,
       unit: null,
       correct: false,
-      revealed: true
+      revealed: true,
+      tags: q.tags
     });
   }
-  // No solution field in the bank yet — reveal states the correct
+  // No solution field in the bank yet â€” reveal states the correct
   // answer so a stuck student can at least unblock themselves.
   aBox.textContent = "The correct answer is " + q.answer.value + " " + q.answer.unit + ".";
   typeset(aBox);
@@ -244,7 +287,8 @@ function onMainButton() {
     submitted_value: parseFloat(aInput.value),
     unit: aUnit.value,
     correct: ok,
-    revealed: false
+    revealed: false,
+    tags: q.tags
   });
   if (ok) {
     feedback.textContent = "Correct.";
@@ -255,7 +299,7 @@ function onMainButton() {
     showSolution(); // learning: always show the worked solution, even on success
   } else {
     feedback.textContent = current.attempts >= 2
-      ? "Still not quite. Check your units and rounding — or take a look below."
+      ? "Still not quite. Check your units and rounding â€” or take a look below."
       : "Not quite. Check your work and try again.";
     feedback.className = "feedback bad";
     feedback.hidden = false;
@@ -280,14 +324,14 @@ function renderBookmarks() {
   var row = document.getElementById("course-bookmarks");
   row.innerHTML = "";
   INDEX.courses.forEach(function (c) {
-    var parts = c.label.split("•");
+    var parts = c.label.split("â€¢");
     var btn = document.createElement("button");
     btn.type = "button";
     btn.className = "bookmark";
     btn.dataset.course = c.id;
     btn.innerHTML =
       '<span class="bookmark-label">' + parts[0].trim() +
-      ' <span class="dot">•</span> ' + parts[1].trim() + "</span>";
+      ' <span class="dot">â€¢</span> ' + parts[1].trim() + "</span>";
     btn.addEventListener("click", function () {
       loadCourse(c.id).then(function (bank) {
         BANK = bank;
@@ -343,7 +387,7 @@ function renderAuth() {
         msg.hidden = false;
         return;
       }
-      msg.textContent = "Sending…";
+      msg.textContent = "Sendingâ€¦";
       msg.hidden = false;
       window.sb.auth.signInWithOtp({
         email: email,
@@ -353,7 +397,7 @@ function renderAuth() {
           msg.textContent = "Couldn't send the link: " + result.error.message;
         } else {
           document.getElementById("auth-form").hidden = true;
-          msg.textContent = "Check your email — the sign-in link is on its way.";
+          msg.textContent = "Check your email â€” the sign-in link is on its way.";
         }
       });
     });
@@ -407,7 +451,7 @@ function pushLocalOnce() {
     .then(function (res) {
       if (res.error) { console.warn("Push skipped (read failed):", res.error.message); return; }
       // What the cloud already has, as comparable signatures. Local ts
-      // (ms) vs cloud created_at: match within ±2 seconds (the DB stamps
+      // (ms) vs cloud created_at: match within Â±2 seconds (the DB stamps
       // created_at just after our client-side ts), same variant required.
       var cloudByVariant = {};
       res.data.forEach(function (row) {

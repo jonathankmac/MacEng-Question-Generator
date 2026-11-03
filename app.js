@@ -142,11 +142,14 @@ function checkNumeric(userValue, answer) {
 
 var ANSWER_LOG_KEY = "answer_log";
 
-function recordAnswer(event) {
-  var log;
+function getLocalEvents() {
   try {
-    log = JSON.parse(localStorage.getItem(ANSWER_LOG_KEY)) || [];
-  } catch (e) { log = []; }
+    return JSON.parse(localStorage.getItem(ANSWER_LOG_KEY)) || [];
+  } catch (e) { return []; }
+}
+
+function recordAnswer(event) {
+  var log = getLocalEvents();
   event.ts = Date.now();
   log.push(event);
   try {
@@ -174,66 +177,127 @@ function recordAnswer(event) {
   }
 }
 
-/* ---------------- Section 5c: tag stats (getTopicStats) ----------------
+/* ---------------- Section 5c: tag stats + question serving ----------------
 
-   Pure derivation over the event log: fold events into per-question
-   states, then aggregate weighted "load" per tag.
+   Three layers, one pass each:
+   1. getQuestionStates(events) — fold raw events into per-question
+      state: { tags, completed, lastTs }. "Completed" = latest visit
+      was first-attempt correct; a visit ends at a correct/revealed event.
+   2. getTopicStats(events) — aggregate states into weighted tag load
+      (backlog metric: completed questions contribute nothing).
+   3. pickNextQuestion(bank, events, avoidIdx) — the serving rule:
+      probability gate u/(u+f) between exploration (unvisited) and
+      repair (failed), weakest tag first, questions scored by the
+      weighted sum of their tags' loads, top-3 randomness. */
 
-   Event → visit: sorted by ts, grouped by variant; a visit ends at a
-   correct or revealed event. A variant's status = its LATEST visit,
-   completed iff that visit's FIRST check was correct.
-
-   Tag load = Σ weight(t) over visited variants whose latest visit is
-   not completed. Completed questions contribute nothing (backlog
-   metric, not a grade). Unvisited variants are invisible. Events from
-   before the weighted-tag schema carry no tags and are skipped. */
-
-function getTopicStats(events) {
-  if (!events || events.length === 0) return null;
-
-  // Fold: variant → { tags, ordered events }
-  var byVariant = {};
+function getQuestionStates(events) {
+  var states = {};
+  if (!events || events.length === 0) return states;
   events.slice().sort(function (a, b) { return a.ts - b.ts; }).forEach(function (e) {
     if (!e.tags) return; // pre-weights schema event: unusable, skip
-    if (!byVariant[e.variant_id]) {
-      byVariant[e.variant_id] = { tags: e.tags, events: [] };
+    var s = states[e.variant_id];
+    if (!s) s = states[e.variant_id] = { tags: e.tags, completed: false, lastTs: 0, inVisit: false, firstOk: null };
+    s.lastTs = e.ts;
+    if (e.correct || e.revealed) {
+      // visit resolution: was this visit's FIRST attempt correct?
+      var firstOk = s.inVisit ? s.firstOk : (e.correct === true);
+      s.completed = firstOk;
+      s.inVisit = false;
+      s.firstOk = null;
+    } else {
+      // a check attempt: opens the visit if none open, records first-attempt
+      if (!s.inVisit) { s.inVisit = true; s.firstOk = (e.correct === true); }
     }
-    byVariant[e.variant_id].events.push(e);
   });
-
-  // Per-variant: is the latest visit completed (first check correct)?
-  var failedWeighted = []; // [{ tags, failedWeight already 1 }], aggregated below
-  var anyCounted = false;
-  Object.keys(byVariant).forEach(function (vid) {
-    var v = byVariant[vid];
-    // cut visits
-    var visits = [];
-    var current = null;
-    v.events.forEach(function (e) {
-      if (!current) current = [];
-      current.push(e);
-      if (e.correct || e.revealed) { visits.push(current); current = null; }
-    });
-    if (current && current.length) visits.push(current); // unresolved tail = latest visit
-
-    var latest = visits[visits.length - 1];
-    var completed = latest[0].correct === true;
-    anyCounted = true;
-    if (completed) return; // weight irrelevant for completed questions
-
-    // failed: push its tag weights into the load
-    Object.keys(v.tags).forEach(function (t) {
-      var w = v.tags[t];
-      failedWeighted.push({ tag: t, w: w });
-    });
+  // strip fold bookkeeping from the public shape
+  Object.keys(states).forEach(function (vid) {
+    delete states[vid].inVisit;
+    delete states[vid].firstOk;
   });
+  return states;
+}
 
-  if (!anyCounted) return null;
+function getTopicStats(events) {
+  var states = getQuestionStates(events);
   var load = {};
-  failedWeighted.forEach(function (f) {
-    load[f.tag] = (load[f.tag] || 0) + f.w;
+  var anyCounted = false;
+  Object.keys(states).forEach(function (vid) {
+    var s = states[vid];
+    anyCounted = true;
+    if (s.completed) return; // weight irrelevant for completed questions
+    Object.keys(s.tags).forEach(function (t) {
+      load[t] = (load[t] || 0) + s.tags[t];
+    });
   });
-  return load;
+  return anyCounted ? load : null;
+}
+
+function pickNextQuestion(bank, events, avoidIdx) {
+  if (events === undefined) events = getLocalEvents();
+  var states = getQuestionStates(events);
+
+  // pools: unvisited (never served) and failed (visited, not completed)
+  var unvisited = [];
+  var failed = [];
+  bank.forEach(function (q, idx) {
+    var s = states[q.id];
+    if (!s) unvisited.push(idx);
+    else if (!s.completed) failed.push({ idx: idx, s: s });
+  });
+
+  // bank exhausted: nothing new, nothing failed -> oldest-served
+  if (unvisited.length === 0 && failed.length === 0) {
+    var oldestIdx = -1;
+    bank.forEach(function (q, idx) {
+      var s = states[q.id];
+      if (s && (oldestIdx === -1 || s.lastTs < states[bank[oldestIdx].id].lastTs)) oldestIdx = idx;
+    });
+    return oldestIdx;
+  }
+
+  // exploration branch (probability gate u/(u+f); forced if no failed pool)
+  if (failed.length === 0 ||
+      (unvisited.length > 0 &&
+       Math.random() < unvisited.length / (unvisited.length + failed.length))) {
+    return unvisited[Math.floor(Math.random() * unvisited.length)];
+  }
+
+  // repair branch: weakest tag — random only among NEAR-TIES (within
+  // 80% of the top load), so a barely-loaded tag can't hijack the pick
+  var load = {};
+  failed.forEach(function (f) {
+    Object.keys(f.s.tags).forEach(function (t) {
+      load[t] = (load[t] || 0) + f.s.tags[t];
+    });
+  });
+  var ranked = Object.keys(load).sort(function (a, b) { return load[b] - load[a]; });
+  var band = load[ranked[0]] * 0.8;
+  var nearTies = ranked.filter(function (t) { return load[t] >= band; }).slice(0, 3);
+  var tag = nearTies[Math.floor(Math.random() * nearTies.length)];
+
+  // candidate pool: failed questions with any weight in that tag,
+  // scored by the weighted sum of their tags' loads
+  var scored = [];
+  failed.forEach(function (f) {
+    if ((f.s.tags[tag] || 0) <= 0) return;
+    var score = 0;
+    Object.keys(f.s.tags).forEach(function (t) {
+      score += f.s.tags[t] * (load[t] || 0);
+    });
+    scored.push({ idx: f.idx, score: score });
+  });
+  scored.sort(function (a, b) { return b.score - a.score; });
+  var topCandidates = scored.slice(0, Math.min(3, scored.length));
+  if (avoidIdx !== undefined) {
+    var filtered = topCandidates.filter(function (c) { return c.idx !== avoidIdx; });
+    if (filtered.length > 0) topCandidates = filtered;
+    else {
+      // all top candidates avoided: take the best non-avoided overall
+      var rest = scored.filter(function (c) { return c.idx !== avoidIdx; });
+      if (rest.length > 0) topCandidates = rest.slice(0, 1);
+    }
+  }
+  return topCandidates[Math.floor(Math.random() * topCandidates.length)].idx;
 }/* ---------------- Section 6: the loop ----------------
 
    question → Check → correct: solution shown, button = Next question
@@ -288,11 +352,7 @@ function showSolution(gaveUp) {
 function onMainButton() {
   if (!current) return;
   if (current.revealed) { // Next question
-    var next = Math.floor(Math.random() * BANK.length);
-    if (BANK.length > 1) {
-      while (next === current.idx) next = Math.floor(Math.random() * BANK.length);
-    }
-    loadQuestion(next);
+    loadQuestion(pickNextQuestion(BANK, undefined, current.idx));
     return;
   }
   // Check answer: parse "number + unit" from the one field, then grade
@@ -371,7 +431,7 @@ function renderBookmarks() {
     btn.addEventListener("click", function () {
       loadCourse(c.id).then(function (bank) {
         BANK = bank;
-        loadQuestion(Math.floor(Math.random() * bank.length));
+        loadQuestion(pickNextQuestion(bank));
       });
     });
     row.appendChild(btn);
@@ -477,9 +537,7 @@ if (window.supabase && window.supabase.createClient) {
    per sign-in, fire-and-forget. */
 
 function pushLocalOnce() {
-  var local = [];
-  try { local = JSON.parse(localStorage.getItem(ANSWER_LOG_KEY)) || []; }
-  catch (e) { local = []; }
+  var local = getLocalEvents();
   if (local.length === 0) return;
 
   window.sb.from("answer_log")

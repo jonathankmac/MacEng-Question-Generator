@@ -452,7 +452,8 @@ var SUPABASE_URL = "https://ixmodvcdksdlzgulksar.supabase.co";
 var SUPABASE_KEY = "sb_publishable_MElxhK9152H_Ly1SvU97vg_zbZP-Jdw";
 
 var authArea = document.getElementById("auth-area");
-var session = null; // null = anonymous; object = signed in
+var session = null;  // null = anonymous; object = signed in
+var authEmail = "";  // phase state of the OTP form (email awaiting its code)
 
 function renderAuth() {
   if (session) {
@@ -467,7 +468,8 @@ function renderAuth() {
       '<button type="button" class="auth-link" id="btn-signin">Sign in to save progress</button>' +
       '<form class="auth-form" id="auth-form" hidden>' +
       '<input id="auth-email" type="email" placeholder="you@example.com" autocomplete="email">' +
-      '<button type="submit" class="btn-mini">Send sign-in link</button>' +
+      '<input id="auth-code" class="auth-code" inputmode="numeric" autocomplete="one-time-code" placeholder="6-digit code" maxlength="6" hidden>' +
+      '<button type="submit" class="btn-mini" id="auth-submit">Send code</button>' +
       "</form>" +
       '<p class="auth-msg" id="auth-msg" hidden></p>';
     document.getElementById("btn-signin").addEventListener("click", function () {
@@ -476,26 +478,37 @@ function renderAuth() {
     });
     document.getElementById("auth-form").addEventListener("submit", function (e) {
       e.preventDefault();
-      var email = document.getElementById("auth-email").value.trim();
       var msg = document.getElementById("auth-msg");
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        msg.textContent = "Please enter a valid email address.";
-        msg.hidden = false;
-        return;
-      }
-      msg.textContent = "Sending…";
       msg.hidden = false;
-      window.sb.auth.signInWithOtp({
-        email: email,
-        options: { emailRedirectTo: location.origin + location.pathname }
-      }).then(function (result) {
-        if (result.error) {
-          msg.textContent = "Couldn't send the link: " + result.error.message;
-        } else {
-          document.getElementById("auth-form").hidden = true;
-          msg.textContent = "Check your email — the sign-in link is on its way.";
+      if (!authEmail) { // phase 1: request a code
+        var email = document.getElementById("auth-email").value.trim();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          msg.textContent = "Please enter a valid email address.";
+          return;
         }
-      });
+        msg.textContent = "Sending…";
+        window.sb.auth.signInWithOtp({ email: email }).then(function (result) {
+          if (result.error) {
+            msg.textContent = "Couldn't send the code: " + result.error.message;
+            return;
+          }
+          authEmail = email;
+          document.getElementById("auth-email").disabled = true;
+          document.getElementById("auth-code").hidden = false;
+          document.getElementById("auth-code").focus();
+          document.getElementById("auth-submit").textContent = "Verify";
+          msg.textContent = "Check your email — a 6-digit code is on its way.";
+        });
+      } else { // phase 2: verify the code
+        var code = document.getElementById("auth-code").value.trim();
+        msg.textContent = "Verifying…";
+        window.sb.auth.verifyOtp({ email: authEmail, token: code, type: "email" }).then(function (result) {
+          // success: onAuthStateChange fires and renderAuth rebuilds the signed-in UI
+          if (result.error) {
+            msg.textContent = "That code didn't match — check the newest email.";
+          }
+        });
+      }
     });
   }
 }

@@ -385,6 +385,12 @@ button {
   min-height: 44px;
 }
 
+.auth-code {
+  letter-spacing: 6px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
 .btn-mini {
   font-size: 14px;
   font-weight: 600;

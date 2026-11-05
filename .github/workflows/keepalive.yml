@@ -1,0 +1,20 @@
+# Keeps the Supabase free-tier project from sleeping after 7 idle days
+# (free projects are paused without periodic API activity).
+name: Supabase keepalive
+
+on:
+  schedule:
+    - cron: "17 4 * * 1" # weekly, Monday 04:17 UTC
+  workflow_dispatch: {} # allow manual runs to verify it works
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST endpoint
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://ixmodvcdksdlzgulksar.supabase.co/rest/v1/" \
+            -H "apikey: sb_publishable_MElxhK9152H_Ly1SvU97vg_zbZP-Jdw")
+          echo "HTTP $code"
+          test "$code" = "200"

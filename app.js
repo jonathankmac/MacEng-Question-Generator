@@ -113,10 +113,11 @@ function normalizeUnit(u) {
 function parseAnswer(text) {
   var t = text.trim().replace(/\s+/g, " ");
   var NUM = "[+-]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][+-]?\\d+)?";
-  // number + unit (unit must start with a non-digit: "10.1 m", "10.1m")
-  var m = t.match(new RegExp("^(" + NUM + ")\\s*([^\\d\\s].*)$"));
+  // number + unit (unit must start with a non-digit AND non-dot:
+  // "10.1 m", "10.1m" — this also stops "0.20" splitting into 0 | ".20")
+  var m = t.match(new RegExp("^(" + NUM + ")\\s*([^\\d\\s.].*)$"));
   if (m) return { value: parseFloat(m[1]), unit: normalizeUnit(m[5]) };
-  // bare number ("15") -> valid value, missing unit
+  // bare number ("15", "0.20") -> valid value, missing unit
   var n = t.match(new RegExp("^(" + NUM + ")$"));
   if (n) return { value: parseFloat(n[1]), unit: "" };
   return { value: NaN, unit: "" };
@@ -340,10 +341,16 @@ function showSolution(gaveUp) {
       tags: q.tags
     });
   }
-  // No solution field in the bank yet — reveal states the correct
-  // answer so a stuck student can at least unblock themselves.
-  aBox.textContent = "The correct answer is " + q.answer.value + " " + q.answer.unit + ".";
-  typeset(aBox);
+  // Show the authored worked solution when the bank has one;
+  // otherwise fall back to stating the correct answer.
+  var sol = q.answer.solution || q.solution;
+  if (sol) {
+    aBox.textContent = sol;
+    typeset(aBox);
+  } else {
+    aBox.textContent = "The correct answer is " + q.answer.value +
+      (q.answer.unit ? " " + q.answer.unit : "") + ".";
+  }
   aBox.hidden = false;
   aInput.disabled = true;
   btnMain.textContent = "Next question";
@@ -362,7 +369,8 @@ function onMainButton() {
   if (isNaN(parsed.value)) {
     ok = false;
     feedback.textContent = "Enter a number with its unit — e.g. 10.1 m.";
-  } else if (!parsed.unit) {
+  } else if (!parsed.unit && q.answer.unit) {
+    // only dimensionless questions accept a bare number
     ok = false;
     feedback.textContent = "Include a unit — e.g. 10.1 m.";
   } else {

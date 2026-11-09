@@ -498,6 +498,8 @@ function renderAuth() {
     document.getElementById("auth-form").addEventListener("submit", function (e) {
       e.preventDefault();
       var msg = document.getElementById("auth-msg");
+      var submitBtn = document.getElementById("auth-submit");
+      if (submitBtn.disabled) return; // ignore double submits while a request is in flight
       msg.hidden = false;
       if (!authEmail) { // phase 1: request a code
         var email = document.getElementById("auth-email").value.trim();
@@ -506,7 +508,9 @@ function renderAuth() {
           return;
         }
         msg.textContent = "Sending…";
+        submitBtn.disabled = true;
         window.sb.auth.signInWithOtp({ email: email }).then(function (result) {
+          submitBtn.disabled = false;
           if (result.error) {
             msg.textContent = "Couldn't send the code: " + result.error.message;
             return;
@@ -515,13 +519,15 @@ function renderAuth() {
           document.getElementById("auth-email").disabled = true;
           document.getElementById("auth-code").hidden = false;
           document.getElementById("auth-code").focus();
-          document.getElementById("auth-submit").textContent = "Verify";
+          submitBtn.textContent = "Verify";
           msg.textContent = "Check your email. A 6-digit code is on its way.";
         });
       } else { // phase 2: verify the code
-        var code = document.getElementById("auth-code").value.trim();
+        var code = document.getElementById("auth-code").value.replace(/\s+/g, "");
         msg.textContent = "Verifying…";
+        submitBtn.disabled = true;
         window.sb.auth.verifyOtp({ email: authEmail, token: code, type: "email" }).then(function (result) {
+          submitBtn.disabled = false;
           // success: onAuthStateChange fires and renderAuth rebuilds the signed-in UI
           if (result.error) {
             msg.textContent = "That code didn't match. Check the newest email.";

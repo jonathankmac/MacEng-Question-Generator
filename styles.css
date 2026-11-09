@@ -427,6 +427,11 @@ button {
   .btn-back { padding: 6px 12px; font-size: 14px; }
 }
 
+.btn-mini:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .view, .bookmark, .bg, .btn-main, .a-box {
     animation: none;

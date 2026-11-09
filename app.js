@@ -206,8 +206,10 @@ function getQuestionStates(events) {
       s.inVisit = false;
       s.firstOk = null;
     } else {
-      // a check attempt: opens the visit if none open, records first-attempt
-      if (!s.inVisit) { s.inVisit = true; s.firstOk = (e.correct === true); }
+      // a check attempt: opens the visit if none open (a newly opened
+      // visit is unresolved, so any prior "completed" status is void),
+      // and records first-attempt
+      if (!s.inVisit) { s.inVisit = true; s.firstOk = (e.correct === true); s.completed = false; }
     }
   });
   // strip fold bookkeeping from the public shape
@@ -274,30 +276,44 @@ function pickNextQuestion(bank, events, avoidIdx) {
   var ranked = Object.keys(load).sort(function (a, b) { return load[b] - load[a]; });
   var band = load[ranked[0]] * 0.8;
   var nearTies = ranked.filter(function (t) { return load[t] >= band; }).slice(0, 3);
-  var tag = nearTies[Math.floor(Math.random() * nearTies.length)];
 
-  // candidate pool: failed questions with any weight in that tag,
-  // scored by the weighted sum of their tags' loads
-  var scored = [];
-  failed.forEach(function (f) {
-    if ((f.s.tags[tag] || 0) <= 0) return;
-    var score = 0;
-    Object.keys(f.s.tags).forEach(function (t) {
-      score += f.s.tags[t] * (load[t] || 0);
+  // candidate pools must exclude the question just served (avoidIdx);
+  // if a near-tie tag's pool is only that question, try the other tags
+  var order = nearTies.slice();
+  for (var i = order.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = order[i]; order[i] = order[j]; order[j] = tmp;
+  }
+  var scored = null;
+  for (var k = 0; k < order.length; k++) {
+    var tag = order[k];
+    var pool = failed.filter(function (f) {
+      return (f.s.tags[tag] || 0) > 0 && f.idx !== avoidIdx;
     });
-    scored.push({ idx: f.idx, score: score });
-  });
+    if (pool.length === 0) continue;
+    scored = pool.map(function (f) {
+      var score = 0;
+      Object.keys(f.s.tags).forEach(function (t) {
+        score += f.s.tags[t] * (load[t] || 0);
+      });
+      return { idx: f.idx, score: score };
+    });
+    break;
+  }
+
+  // every near-tie pool was only the avoided question: fall back to a
+  // fresh unvisited question; if none exist, repeating is unavoidable
+  if (!scored && unvisited.length > 0) {
+    return unvisited[Math.floor(Math.random() * unvisited.length)];
+  }
+  if (!scored) {
+    var tag = nearTies[0];
+    scored = failed.filter(function (f) { return (f.s.tags[tag] || 0) > 0; })
+      .map(function (f) { return { idx: f.idx, score: 0 }; });
+  }
+
   scored.sort(function (a, b) { return b.score - a.score; });
   var topCandidates = scored.slice(0, Math.min(3, scored.length));
-  if (avoidIdx !== undefined) {
-    var filtered = topCandidates.filter(function (c) { return c.idx !== avoidIdx; });
-    if (filtered.length > 0) topCandidates = filtered;
-    else {
-      // all top candidates avoided: take the best non-avoided overall
-      var rest = scored.filter(function (c) { return c.idx !== avoidIdx; });
-      if (rest.length > 0) topCandidates = rest.slice(0, 1);
-    }
-  }
   return topCandidates[Math.floor(Math.random() * topCandidates.length)].idx;
 }/* ---------------- Section 6: the loop ----------------
 
@@ -341,16 +357,11 @@ function showSolution(gaveUp) {
       tags: q.tags
     });
   }
-  // Show the authored worked solution when the bank has one;
-  // otherwise fall back to stating the correct answer.
-  var sol = q.answer.solution || q.solution;
-  if (sol) {
-    aBox.textContent = sol;
-    typeset(aBox);
-  } else {
-    aBox.textContent = "The correct answer is " + q.answer.value +
-      (q.answer.unit ? " " + q.answer.unit : "") + ".";
-  }
+  // Simple-question format: no authored solutions. The reveal states
+  // the correct answer — for plug-and-chug problems that is the
+  // diagnostic a student needs to find their own slip.
+  var unit = q.answer.unit;
+  aBox.textContent = "The correct answer is " + q.answer.value + (unit ? " " + unit : "") + ".";
   aBox.hidden = false;
   aInput.disabled = true;
   btnMain.textContent = "Next question";
@@ -368,11 +379,11 @@ function onMainButton() {
   var ok;
   if (isNaN(parsed.value)) {
     ok = false;
-    feedback.textContent = "Enter a number with its unit — e.g. 10.1 m.";
+    feedback.textContent = "Enter a number with its unit (e.g. 10.1 m).";
   } else if (!parsed.unit && q.answer.unit) {
     // only dimensionless questions accept a bare number
     ok = false;
-    feedback.textContent = "Include a unit — e.g. 10.1 m.";
+    feedback.textContent = "Include a unit (e.g. 10.1 m).";
   } else {
     var numOk = checkNumeric(parsed.value, q.answer);
     var unitOk = parsed.unit === normalizeUnit(q.answer.unit);
@@ -394,7 +405,7 @@ function onMainButton() {
       return;
     }
     feedback.textContent = numOk
-      ? "Not quite — check your units."
+      ? "Not quite. Check your units."
       : "Not quite. Check your work and try again.";
   }
   feedback.className = "feedback bad";
@@ -439,7 +450,7 @@ function renderBookmarks() {
     btn.addEventListener("click", function () {
       loadCourse(c.id).then(function (bank) {
         BANK = bank;
-        loadQuestion(pickNextQuestion(bank));
+        loadQuestion(pickNextQuestion(bank, undefined, current ? current.idx : undefined));
       });
     });
     row.appendChild(btn);
@@ -476,7 +487,7 @@ function renderAuth() {
       '<button type="button" class="auth-link" id="btn-signin">Sign in to save progress</button>' +
       '<form class="auth-form" id="auth-form" hidden>' +
       '<input id="auth-email" type="email" placeholder="you@example.com" autocomplete="email">' +
-      '<input id="auth-code" class="auth-code" inputmode="numeric" autocomplete="one-time-code" placeholder="6-digit code" maxlength="6" hidden>' +
+      '<input id="auth-code" class="auth-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" hidden>' +
       '<button type="submit" class="btn-mini" id="auth-submit">Send code</button>' +
       "</form>" +
       '<p class="auth-msg" id="auth-msg" hidden></p>';
@@ -505,7 +516,7 @@ function renderAuth() {
           document.getElementById("auth-code").hidden = false;
           document.getElementById("auth-code").focus();
           document.getElementById("auth-submit").textContent = "Verify";
-          msg.textContent = "Check your email — a 6-digit code is on its way.";
+          msg.textContent = "Check your email. A 6-digit code is on its way.";
         });
       } else { // phase 2: verify the code
         var code = document.getElementById("auth-code").value.trim();
@@ -513,7 +524,7 @@ function renderAuth() {
         window.sb.auth.verifyOtp({ email: authEmail, token: code, type: "email" }).then(function (result) {
           // success: onAuthStateChange fires and renderAuth rebuilds the signed-in UI
           if (result.error) {
-            msg.textContent = "That code didn't match — check the newest email.";
+            msg.textContent = "That code didn't match. Check the newest email.";
           }
         });
       }

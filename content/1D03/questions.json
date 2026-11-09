@@ -8,8 +8,7 @@
     "answer": {
       "value": 2.0,
       "tolerance": 0.05,
-      "unit": "s",
-      "solution": "The instantaneous velocity is the time derivative of position. Differentiating term by term: the derivative of the constant $-4$ is zero, the derivative of $8t$ is $8$, and the derivative of $-2t^2$ is $-4t$ by the power rule. So $v(t) = \\frac{dx}{dt} = 8 - 4t$ in m/s. The particle is instantaneously at rest when $v = 0$, i.e. $8 - 4t = 0$. Solving gives $4t = 8$, so $t = 2\\,\\mathrm{s}$. As a check, the velocity function is linear with slope $-4\\,\\mathrm{m/s^2}$ (the constant acceleration), so it passes through zero exactly once, at $t = 2\\,\\mathrm{s}$."
+      "unit": "s"
     }
   },
   {
@@ -21,8 +20,7 @@
     "answer": {
       "value": 6.0,
       "tolerance": 0.1,
-      "unit": "m",
-      "solution": "Displacement is the change in position, $\\Delta x = x(t_f) - x(t_i)$, regardless of what happens in between. Evaluate the position at each endpoint. At $t = 0$: $x(0) = -4 + 0 - 0 = -4\\,\\mathrm{m}$. At $t = 3$: $x(3) = -4 + 8(3) - 2(3)^2 = -4 + 24 - 18 = 2\\,\\mathrm{m}$. Therefore $\\Delta x = 2 - (-4) = 6\\,\\mathrm{m}$. Note this is displacement, not distance traveled: the particle reverses direction at $t = 2\\,\\mathrm{s}$ (where $v = 0$), so it first moves forward from $-4\\,\\mathrm{m}$ to a maximum of $x(2) = 4\\,\\mathrm{m}$, then moves back to $2\\,\\mathrm{m}$. The total distance traveled is $8 + 2 = 10\\,\\mathrm{m}$, larger than the $6\\,\\mathrm{m}$ displacement."
+      "unit": "m"
     }
   },
   {
@@ -34,8 +32,7 @@
     "answer": {
       "value": 90.0,
       "tolerance": 1.0,
-      "unit": "m",
-      "solution": "List the knowns: $v_0 = 30\\,\\mathrm{m/s}$, $v = 0$ (the car stops), $a = -5\\,\\mathrm{m/s^2}$ (negative because it opposes the motion), and the unknown is $\\Delta x$. Time is not involved, so choose the time-free equation $v^2 = v_0^2 + 2a\\Delta x$. Substituting: $0 = 30^2 + 2(-5)\\Delta x = 900 - 10\\Delta x$. Solving, $\\Delta x = \\frac{900}{10} = 90\\,\\mathrm{m}$. A check using time: the car stops in $t = v_0/|a| = 30/5 = 6\\,\\mathrm{s}$, and $\\Delta x = \\frac{v_0 + v}{2}t = \\frac{30}{2}(6) = 90\\,\\mathrm{m}$."
+      "unit": "m"
     }
   },
   {
@@ -47,8 +44,7 @@
     "answer": {
       "value": 6.0,
       "tolerance": 0.05,
-      "unit": "s",
-      "solution": "Knowns: $v_0 = 30\\,\\mathrm{m/s}$, $v = 0$, $a = -5\\,\\mathrm{m/s^2}$; unknown is $t$. Since displacement is not involved, use $v = v_0 + at$. Substituting: $0 = 30 + (-5)t$, so $5t = 30$ and $t = 6\\,\\mathrm{s}$. Check: the average velocity during constant deceleration is $\\frac{v_0 + v}{2} = 15\\,\\mathrm{m/s}$, and $15 \\times 6 = 90\\,\\mathrm{m}$, matching the stopping distance found in the previous part."
+      "unit": "s"
     }
   },
   {
@@ -60,8 +56,7 @@
     "answer": {
       "value": 2.04,
       "tolerance": 0.05,
-      "unit": "s",
-      "solution": "First resolve the launch velocity into components: $v_{0y} = v_0\\sin\\theta = 20\\sin 30^\\circ = 20(0.5) = 10\\,\\mathrm{m/s}$ and $v_{0x} = v_0\\cos\\theta = 20\\cos 30^\\circ = 17.32\\,\\mathrm{m/s}$. The vertical motion is free fall with initial upward velocity $v_{0y}$: $y(t) = v_{0y}t - \\frac{1}{2}gt^2$. The ball returns to launch height when $y = 0$, so $v_{0y}t = \\frac{1}{2}gt^2$, and excluding the trivial $t = 0$ solution, $t = \\frac{2v_{0y}}{g} = \\frac{2(10)}{9.8} = 2.04\\,\\mathrm{s}$. The horizontal component is irrelevant here because gravity acts only vertically; the flight time is set entirely by $v_{0y}$."
+      "unit": "s"
     }
   },
   {
@@ -73,8 +68,7 @@
     "answer": {
       "value": 5.1,
       "tolerance": 0.1,
-      "unit": "m",
-      "solution": "At the top of the trajectory the vertical velocity is momentarily zero: $v_y = 0$. Using the vertical component $v_{0y} = 20\\sin 30^\\circ = 10\\,\\mathrm{m/s}$ and the time-free vertical equation $v_y^2 = v_{0y}^2 - 2gh$: $0 = 10^2 - 2(9.8)h$. Solving, $h = \\frac{100}{19.6} = 5.10\\,\\mathrm{m}$. As a check using time: the ball reaches the top at $t = v_{0y}/g = 10/9.8 = 1.02\\,\\mathrm{s}$ (half the total flight time, by symmetry), and $h = v_{0y}t - \\frac{1}{2}gt^2 = 10(1.02) - 4.9(1.02)^2 = 10.2 - 5.1 = 5.1\\,\\mathrm{m}$."
+      "unit": "m"
     }
   },
   {
@@ -86,8 +80,7 @@
     "answer": {
       "value": 35.35,
       "tolerance": 0.5,
-      "unit": "m",
-      "solution": "Method 1: the horizontal velocity is constant because there is no horizontal acceleration, so $R = v_{0x}t$ with $v_{0x} = 20\\cos 30^\\circ = 17.32\\,\\mathrm{m/s}$ and the flight time $t = 2.04\\,\\mathrm{s}$ from part (a). Thus $R = 17.32 \\times 2.04 = 35.35\\,\\mathrm{m}$. Method 2 (independent check): the range formula for level ground is $R = \\frac{v_0^2\\sin 2\\theta}{g} = \\frac{20^2\\sin 60^\\circ}{9.8} = \\frac{400(0.8660)}{9.8} = 35.35\\,\\mathrm{m}$. Both methods agree. Note that $30^\\circ$ and $60^\\circ$ launches at the same speed give the same range, since $\\sin 2\\theta$ is symmetric about $45^\\circ$."
+      "unit": "m"
     }
   },
   {
@@ -99,8 +92,7 @@
     "answer": {
       "value": 3.14,
       "tolerance": 0.05,
-      "unit": "m/s",
-      "solution": "In uniform circular motion the speed is constant and the point travels one circumference (distance $2\\pi r$) in one period $T$. So $v = \\frac{2\\pi r}{T} = \\frac{2\\pi(0.8)}{1.6}$. Compute: $2\\pi(0.8) = 5.027\\,\\mathrm{m}$ per revolution, divided by $1.6\\,\\mathrm{s}$ gives $v = 3.14\\,\\mathrm{m/s}$ (numerically $\\pi$). The angular speed is $\\omega = \\frac{2\\pi}{T} = 3.93\\,\\mathrm{rad/s}$, and indeed $v = \\omega r = 3.93 \\times 0.8 = 3.14\\,\\mathrm{m/s}$, consistent."
+      "unit": "m/s"
     }
   },
   {
@@ -112,8 +104,7 @@
     "answer": {
       "value": 12.34,
       "tolerance": 0.15,
-      "unit": "m/s^2",
-      "solution": "Even though the speed is constant, the velocity direction changes continuously, so the point accelerates toward the center with magnitude $a_c = \\frac{v^2}{r}$. Using $v = 3.14\\,\\mathrm{m/s}$ from the previous part: $a_c = \\frac{(3.14)^2}{0.8} = \\frac{9.87}{0.8} = 12.34\\,\\mathrm{m/s^2}$. Equivalent form: $a_c = \\frac{4\\pi^2 r}{T^2} = \\frac{4\\pi^2(0.8)}{(1.6)^2} = \\frac{31.58}{2.56} = 12.34\\,\\mathrm{m/s^2}$. This is about $1.26$ times $g$, so a rider feels a strong inward push from the carousel structure."
+      "unit": "m/s^2"
     }
   },
   {
@@ -125,8 +116,7 @@
     "answer": {
       "value": 2.78,
       "tolerance": 0.05,
-      "unit": "m/s^2",
-      "solution": "Set up axes along and perpendicular to the incline. Resolve gravity: the component along the slope is $mg\\sin\\theta$ (pointing down-slope) and the perpendicular component is $mg\\cos\\theta$ (into the surface). The kinetic friction force is $f_k = \\mu_k N = \\mu_k mg\\cos\\theta$, directed up-slope because it opposes the sliding. Newton's second law along the slope: $mg\\sin\\theta - \\mu_k mg\\cos\\theta = ma$. The mass cancels, showing the result is independent of the $2\\,\\mathrm{kg}$: $a = g(\\sin\\theta - \\mu_k\\cos\\theta)$. Numerically, $\\sin 30^\\circ = 0.500$ and $\\cos 30^\\circ = 0.866$, so $a = 9.8(0.500 - 0.25 \\times 0.866) = 9.8(0.500 - 0.2165) = 9.8 \\times 0.2835 = 2.78\\,\\mathrm{m/s^2}$, directed down the slope."
+      "unit": "m/s^2"
     }
   },
   {
@@ -138,34 +128,7 @@
     "answer": {
       "value": 4.71,
       "tolerance": 0.1,
-      "unit": "m/s",
-      "solution": "Knowns: $v_0 = 0$ (released from rest), $a = 2.78\\,\\mathrm{m/s^2}$, $\\Delta x = 4\\,\\mathrm{m}$; unknown is $v$. Time is not given or asked for, so use $v^2 = v_0^2 + 2a\\Delta x$: $v^2 = 0 + 2(2.78)(4) = 22.24$. Taking the square root, $v = 4.71\\,\\mathrm{m/s}$. Check with time: $\\Delta x = \\frac{1}{2}at^2$ gives $t = \\sqrt{2(4)/2.78} = 1.70\\,\\mathrm{s}$, and then $v = at = 2.78 \\times 1.70 = 4.72\\,\\mathrm{m/s}$, within rounding. Note the answer is independent of the block's mass, because the acceleration itself was mass-independent."
-    }
-  },
-  {
-    "id": "kin-conical-pendulum-7a",
-    "tags": {
-      "circular-pendulum": 1.0
-    },
-    "prompt": "A $0.5\\,\\mathrm{kg}$ bob swings as a conical pendulum on a $1.5\\,\\mathrm{m}$ string with period $2.0\\,\\mathrm{s}$. What angle does the string make with the vertical? (Use $g = 9.8\\,\\mathrm{m/s^2}$.)",
-    "answer": {
-      "value": 48.6,
-      "tolerance": 0.5,
-      "unit": "deg",
-      "solution": "In a conical pendulum the bob moves in a horizontal circle while the string traces a cone. The period depends only on the vertical extent of the string: $T_{\\text{period}} = 2\\pi\\sqrt{\\frac{L\\cos\\theta}{g}}$, where $L\\cos\\theta$ is the vertical drop from the pivot to the circle's plane. Solve for $L\\cos\\theta$ by squaring: $T^2 = 4\\pi^2\\frac{L\\cos\\theta}{g}$, so $L\\cos\\theta = \\frac{gT^2}{4\\pi^2} = \\frac{9.8 \\times 4}{4\\pi^2} = \\frac{39.2}{39.48} = 0.993\\,\\mathrm{m}$. Since the full string length is $L = 1.5\\,\\mathrm{m}$, we get $\\cos\\theta = \\frac{0.993}{1.5} = 0.662$, hence $\\theta = \\arccos(0.662) = 48.6^\\circ$. Notice the mass never entered: a $2\\,\\mathrm{kg}$ bob on the same string with the same period would hang at exactly the same angle."
-    }
-  },
-  {
-    "id": "kin-conical-pendulum-7b",
-    "tags": {
-      "circular-pendulum": 1.0
-    },
-    "prompt": "A $0.5\\,\\mathrm{kg}$ bob swings as a conical pendulum on a $1.5\\,\\mathrm{m}$ string with the string at $48.6^\\circ$ from the vertical. What is the tension in the string? (Use $g = 9.8\\,\\mathrm{m/s^2}$.)",
-    "answer": {
-      "value": 7.4,
-      "tolerance": 0.1,
-      "unit": "N",
-      "solution": "The bob moves in a horizontal circle, so it has no vertical acceleration: the vertical forces must balance. The only forces on the bob are the tension $T$ along the string and the weight $mg$ downward. The vertical component of the tension is $T\\cos\\theta$ (upward), so vertical equilibrium requires $T\\cos\\theta = mg$. Solving, $T = \\frac{mg}{\\cos\\theta} = \\frac{0.5 \\times 9.8}{\\cos 48.6^\\circ} = \\frac{4.9}{0.662} = 7.40\\,\\mathrm{N}$. The tension always exceeds the weight in a conical pendulum, because it must both hold the bob up and provide the horizontal centripetal pull; here $7.40\\,\\mathrm{N}$ versus $mg = 4.9\\,\\mathrm{N}$, i.e. $T = mg/\\cos\\theta > mg$ for any $\\theta > 0$."
+      "unit": "m/s"
     }
   },
   {
@@ -178,8 +141,7 @@
     "answer": {
       "value": 3.53,
       "tolerance": 0.1,
-      "unit": "m/s",
-      "solution": "The bob travels a horizontal circle of radius $r = L\\sin\\theta$, since the string, the vertical line through the pivot, and the radius form a right triangle with hypotenuse $L$. Numerically $r = 1.5\\sin 48.6^\\circ = 1.5 \\times 0.750 = 1.12\\,\\mathrm{m}$. In one period the bob covers one circumference, so $v = \\frac{2\\pi r}{T} = \\frac{2\\pi(1.12)}{2.0} = 3.53\\,\\mathrm{m/s}$. Equivalent route: the angular speed is $\\omega = \\frac{2\\pi}{T} = 3.14\\,\\mathrm{rad/s}$, and $v = \\omega r = 3.14 \\times 1.12 = 3.53\\,\\mathrm{m/s}$. Note that $r$ here is the horizontal radius, not the string length; using $L = 1.5\\,\\mathrm{m}$ in place of $r$ would be a common error."
+      "unit": "m/s"
     }
   },
   {
@@ -191,8 +153,7 @@
     "answer": {
       "value": 50.0,
       "tolerance": 1.0,
-      "unit": "m",
-      "solution": "Work in the ground frame by adding velocities: the boat's velocity relative to the ground is the vector sum of its velocity relative to the water and the water's velocity relative to the ground. Heading straight across, the boat's cross-stream component is $4\\,\\mathrm{m/s}$ and it picks up the full current of $2\\,\\mathrm{m/s}$ downstream, since the two are perpendicular. The crossing time is set only by the cross-stream motion: $t = \\frac{100}{4} = 25\\,\\mathrm{s}$. During those $25\\,\\mathrm{s}$ the current carries the boat downstream at $2\\,\\mathrm{m/s}$, so the drift is $2 \\times 25 = 50\\,\\mathrm{m}$. The key idea: perpendicular velocity components are independent, so the current does not change the crossing time, only where the boat lands."
+      "unit": "m"
     }
   },
   {
@@ -205,8 +166,7 @@
     "answer": {
       "value": 30.0,
       "tolerance": 0.5,
-      "unit": "deg",
-      "solution": "To land directly opposite, the boat's ground velocity must have zero component along the river. If the boat heads at angle $\\theta$ upstream of straight-across, its upstream velocity component relative to the water is $4\\sin\\theta$, which must exactly cancel the $2\\,\\mathrm{m/s}$ current: $4\\sin\\theta = 2$. Solving, $\\sin\\theta = 0.5$, so $\\theta = 30^\\circ$ upstream. Check the geometry: this works only if the boat is faster than the current ($4 > 2$); if the current were $4\\,\\mathrm{m/s}$ or more, no heading could produce a straight crossing. The remaining upstream-pointing component does not help or hurt the crossing; the effective cross-stream speed becomes $4\\cos 30^\\circ = 3.46\\,\\mathrm{m/s}$, slower than the straight-across heading."
+      "unit": "deg"
     }
   },
   {
@@ -219,8 +179,7 @@
     "answer": {
       "value": 4.27,
       "tolerance": 0.05,
-      "unit": "m/s",
-      "solution": "Use the relative-velocity chain: $\\vec{v}_{\\text{passenger/ground}} = \\vec{v}_{\\text{passenger/train}} + \\vec{v}_{\\text{train/ground}}$. Take $\\hat{x}$ along the tracks and $\\hat{y}$ across the car. Then $\\vec{v}_{\\text{pg}} = (4\\,\\hat{x}) + (1.5\\,\\hat{y})\\,\\mathrm{m/s}$, since the two motions are perpendicular. The magnitude follows from the Pythagorean theorem: $|\\vec{v}| = \\sqrt{4^2 + 1.5^2} = \\sqrt{16 + 2.25} = \\sqrt{18.25} = 4.27\\,\\mathrm{m/s}$. The direction is $\\arctan(1.5/4) = 20.6^\\circ$ from the train's direction of travel. Note the magnitude is not $4 + 1.5 = 5.5\\,\\mathrm{m/s}$: velocities add as vectors, not scalars, and perpendicular components combine with the Pythagorean theorem."
+      "unit": "m/s"
     }
   },
   {
@@ -233,8 +192,7 @@
     "answer": {
       "value": 17.1,
       "tolerance": 0.2,
-      "unit": "m",
-      "solution": "The crossing time is determined by the motion across the car: $t = \\frac{6\\,\\mathrm{m}}{1.5\\,\\mathrm{m/s}} = 4\\,\\mathrm{s}$. Because both components of her ground velocity are constant ($4\\,\\mathrm{m/s}$ along the tracks, $1.5\\,\\mathrm{m/s}$ across), each displacement component is simply velocity times time: $d_x = 4 \\times 4 = 16\\,\\mathrm{m}$ along the tracks and $d_y = 1.5 \\times 4 = 6\\,\\mathrm{m}$ across. The magnitude of the total displacement is $|\\vec{d}| = \\sqrt{16^2 + 6^2} = \\sqrt{256 + 36} = \\sqrt{292} = 17.1\\,\\mathrm{m}$. Geometrically, her ground path is a straight diagonal line across a $16\\,\\mathrm{m} \\times 6\\,\\mathrm{m}$ rectangle; the crossing time is unaffected by the train's motion, exactly as in the river-crossing problem."
+      "unit": "m"
     }
   },
   {
@@ -247,8 +205,7 @@
     "answer": {
       "value": 2.02,
       "tolerance": 0.05,
-      "unit": "s",
-      "solution": "Horizontal and vertical motions are independent: the horizontal velocity has no effect on the fall time. The ball leaves the cliff edge with zero vertical velocity ($v_{0y} = 0$), so the vertical motion is pure free fall from rest: $h = \\frac{1}{2}gt^2$. Solving for time, $t = \\sqrt{\\frac{2h}{g}} = \\sqrt{\\frac{2(20)}{9.8}} = \\sqrt{\\frac{40}{9.8}} = \\sqrt{4.082} = 2.02\\,\\mathrm{s}$. The $15\\,\\mathrm{m/s}$ horizontal speed is a distractor for this part: a ball simply dropped from the same cliff would land after exactly the same $2.02\\,\\mathrm{s}$. Only if the launch had an upward or downward vertical component would the flight time change."
+      "unit": "s"
     }
   },
   {
@@ -261,8 +218,7 @@
     "answer": {
       "value": 30.3,
       "tolerance": 0.3,
-      "unit": "m",
-      "solution": "The horizontal velocity stays constant at $v_{0x} = 15\\,\\mathrm{m/s}$ throughout the flight, since gravity only acts vertically. The horizontal distance covered in time $t$ is $R = v_{0x}t = 15 \\times 2.02 = 30.3\\,\\mathrm{m}$, measured from the base of the cliff. Combining with the drop height, the landing point is $30.3\\,\\mathrm{m}$ out and $20\\,\\mathrm{m}$ down, a straight-line displacement of $\\sqrt{30.3^2 + 20^2} = 36.3\\,\\mathrm{m}$ from the launch point. The separation of the two motions is the key idea in projectile analysis: time comes from the vertical equation, distance from the horizontal one, linked only by the shared $t$."
+      "unit": "m"
     }
   },
   {
@@ -275,38 +231,7 @@
     "answer": {
       "value": 24.8,
       "tolerance": 0.3,
-      "unit": "m/s",
-      "solution": "Find each velocity component at impact. The horizontal component is unchanged: $v_x = 15\\,\\mathrm{m/s}$. The vertical component has grown from zero at the rate $g$: $v_y = gt = 9.8 \\times 2.02 = 19.8\\,\\mathrm{m/s}$ (equivalently $v_y = \\sqrt{2gh} = \\sqrt{392} = 19.8\\,\\mathrm{m/s}$, without needing the time). The speed is the magnitude of the velocity vector: $v = \\sqrt{v_x^2 + v_y^2} = \\sqrt{15^2 + 19.8^2} = \\sqrt{225 + 392} = \\sqrt{617} = 24.8\\,\\mathrm{m/s}$. The impact angle below the horizontal is $\\arctan(19.8/15) = 52.9^\\circ$. An energy check: $v = \\sqrt{v_0^2 + 2gh} = \\sqrt{225 + 392} = 24.8\\,\\mathrm{m/s}$, the same result obtained without splitting into components."
-    }
-  },
-  {
-    "id": "kin-projectile-rel-12a",
-    "tags": {
-      "projectile-motion": 1.0,
-      "relative-motion-in-two-dimensions": 0.5,
-      "two-dimensional-motion": 0.5
-    },
-    "prompt": "A cannon on a cart moving at $5\\,\\mathrm{m/s}$ (relative to the ground) fires a projectile at $20\\,\\mathrm{m/s}$ at $40^\\circ$ above the horizontal, measured relative to the cart, in the direction of the cart's motion. What is the projectile's range relative to the ground? (Use $g = 9.8\\,\\mathrm{m/s^2}$.)",
-    "answer": {
-      "value": 53.3,
-      "tolerance": 0.5,
-      "unit": "m",
-      "solution": "Step 1, convert to the ground frame: the muzzle velocity relative to the cart has components $20\\cos 40^\\circ = 15.32\\,\\mathrm{m/s}$ (horizontal) and $20\\sin 40^\\circ = 12.86\\,\\mathrm{m/s}$ (vertical). The cart's $5\\,\\mathrm{m/s}$ adds entirely to the horizontal component, so relative to the ground $v_x = 5 + 15.32 = 20.32\\,\\mathrm{m/s}$ and $v_y = 12.86\\,\\mathrm{m/s}$ (the cart adds nothing vertically). Step 2, projectile analysis in the ground frame: the time of flight depends only on the vertical component, $t = \\frac{2v_y}{g} = \\frac{2(12.86)}{9.8} = 2.62\\,\\mathrm{s}$. Step 3, the ground range is $R = v_x t = 20.32 \\times 2.62 = 53.3\\,\\mathrm{m}$. The cart's motion stretched the range because it added forward speed without changing the flight time."
-    }
-  },
-  {
-    "id": "kin-projectile-rel-12b",
-    "tags": {
-      "projectile-motion": 1.0,
-      "relative-motion-in-two-dimensions": 0.5,
-      "two-dimensional-motion": 0.5
-    },
-    "prompt": "A cannon on a cart moving at $5\\,\\mathrm{m/s}$ (relative to the ground) fires a projectile at $20\\,\\mathrm{m/s}$ at $40^\\circ$ above the horizontal, measured relative to the cart, in the direction of the cart's motion. What is the projectile's range relative to the cart? (Use $g = 9.8\\,\\mathrm{m/s^2}$.)",
-    "answer": {
-      "value": 40.2,
-      "tolerance": 0.5,
-      "unit": "m",
-      "solution": "In the cart's frame, the projectile is launched at $20\\,\\mathrm{m/s}$ at $40^\\circ$, which is how the launch speed was given. The flight time is the same in both frames (vertical motion is identical: $t = \\frac{2(20\\sin 40^\\circ)}{g} = 2.62\\,\\mathrm{s}$, since the cart does not accelerate vertically relative to the ground). The horizontal launch speed relative to the cart is $20\\cos 40^\\circ = 15.32\\,\\mathrm{m/s}$, so the range relative to the cart is $R_{\\text{cart}} = 15.32 \\times 2.62 = 40.2\\,\\mathrm{m}$. The difference from the ground frame ($53.3 - 40.2 = 13.1\\,\\mathrm{m}$) equals the cart's own travel during the flight: $5\\,\\mathrm{m/s} \\times 2.62\\,\\mathrm{s} = 13.1\\,\\mathrm{m}$, as expected."
+      "unit": "m/s"
     }
   },
   {
@@ -319,8 +244,7 @@
     "answer": {
       "value": 12.0,
       "tolerance": 0.1,
-      "unit": "rad/s",
-      "solution": "Knowns: $\\omega_0 = 0$ (from rest), $\\alpha = 3.0\\,\\mathrm{rad/s^2}$, $t = 4\\,\\mathrm{s}$. The angular analog of $v = v_0 + at$ is $\\omega = \\omega_0 + \\alpha t$. Substituting: $\\omega = 0 + (3.0)(4) = 12\\,\\mathrm{rad/s}$. Every rotational kinematics equation mirrors a linear one with $\\theta$ in place of $x$, $\\omega$ in place of $v$, and $\\alpha$ in place of $a$, valid whenever $\\alpha$ is constant, exactly as the linear versions require constant $a$."
+      "unit": "rad/s"
     }
   },
   {
@@ -333,8 +257,7 @@
     "answer": {
       "value": 3.82,
       "tolerance": 0.05,
-      "unit": "rev",
-      "solution": "Use the angular analog of $x = x_0 + v_0 t + \\frac{1}{2}at^2$, which is $\\theta = \\theta_0 + \\omega_0 t + \\frac{1}{2}\\alpha t^2$. With $\\theta_0 = 0$ and $\\omega_0 = 0$: $\\theta = \\frac{1}{2}\\alpha t^2 = \\frac{1}{2}(3.0)(4^2) = \\frac{1}{2}(3.0)(16) = 24\\,\\mathrm{rad}$. One revolution is $2\\pi$ radians, so $\\theta = \\frac{24}{2\\pi} = \\frac{24}{6.283} = 3.82\\,\\mathrm{rev}$. A check using the average angular velocity: since $\\omega$ grows linearly from $0$ to $12\\,\\mathrm{rad/s}$, the average is $6\\,\\mathrm{rad/s}$, and $\\theta = \\bar{\\omega}t = 6 \\times 4 = 24\\,\\mathrm{rad}$."
+      "unit": "rev"
     }
   },
   {
@@ -347,8 +270,7 @@
     "answer": {
       "value": 4.8,
       "tolerance": 0.05,
-      "unit": "m/s",
-      "solution": "The conversion from angular to linear speed at radius $r$ is $v = \\omega r$, valid when $\\omega$ is in radians per second (this is why radians are the natural angular unit: arc length $s = r\\theta$ only holds in radians). Substituting: $v = (12)(0.4) = 4.8\\,\\mathrm{m/s}$. Every point on the wheel shares the same $\\omega$, but the linear speed grows linearly with distance from the axis: a point halfway out ($r = 0.2\\,\\mathrm{m}$) moves at $2.4\\,\\mathrm{m/s}$, and the hub center is instantaneously at rest."
+      "unit": "m/s"
     }
   },
   {
@@ -361,8 +283,7 @@
     "answer": {
       "value": 9.6,
       "tolerance": 0.05,
-      "unit": "m",
-      "solution": "The arc length relation is $s = r\\theta$, again requiring $\\theta$ in radians. Substituting: $s = (0.4)(24) = 9.6\\,\\mathrm{m}$. To interpret: $24\\,\\mathrm{rad}$ is $\\frac{24}{2\\pi} = 3.82$ revolutions, and each revolution carries a rim point around a circumference of $2\\pi r = 2.513\\,\\mathrm{m}$; multiplying, $3.82 \\times 2.513 = 9.6\\,\\mathrm{m}$. If the angle had been given in degrees or revolutions, it would have to be converted to radians first, a common mistake in angular-to-linear conversions."
+      "unit": "m"
     }
   },
   {
@@ -375,8 +296,7 @@
     "answer": {
       "value": 1.57,
       "tolerance": 0.02,
-      "unit": "rad/s^2",
-      "solution": "First convert the initial spin rate to standard units: $300\\,\\mathrm{rpm}$ means $300$ revolutions per minute, so $\\omega_0 = 300 \\times \\frac{2\\pi\\,\\mathrm{rad}}{1\\,\\mathrm{rev}} \\times \\frac{1\\,\\mathrm{min}}{60\\,\\mathrm{s}} = 300 \\times \\frac{2\\pi}{60} = 10\\pi = 31.4\\,\\mathrm{rad/s}$. The fan stops, so $\\omega = 0$ at $t = 20\\,\\mathrm{s}$. With constant angular acceleration, $\\alpha = \\frac{\\omega - \\omega_0}{t} = \\frac{0 - 31.4}{20} = -1.57\\,\\mathrm{rad/s^2}$. The magnitude of the deceleration is $1.57\\,\\mathrm{rad/s^2}$; the minus sign shows that $\\alpha$ opposes the spin. Uniform deceleration is what makes the constant-$\\alpha$ equations applicable here at all."
+      "unit": "rad/s^2"
     }
   },
   {
@@ -389,8 +309,7 @@
     "answer": {
       "value": 50.0,
       "tolerance": 0.5,
-      "unit": "rev",
-      "solution": "Method 1: with constant $\\alpha$, the angular speed falls linearly, so the average angular speed over the stop is exactly the midpoint, $\\bar{\\omega} = \\frac{\\omega_0 + 0}{2} = 15.7\\,\\mathrm{rad/s}$. The total angle is $\\theta = \\bar{\\omega}t = 15.7 \\times 20 = 314\\,\\mathrm{rad}$. Converting to revolutions: $\\frac{314}{2\\pi} = 50.0\\,\\mathrm{rev}$. Method 2 (independent check): $\\theta = \\frac{\\omega_0^2}{2|\\alpha|} = \\frac{(31.4)^2}{2(1.57)} = \\frac{986}{3.14} = 314\\,\\mathrm{rad} = 50\\,\\mathrm{rev}$. Equivalently, in revolutions directly, the average is $150\\,\\mathrm{rpm}$ sustained for $\\frac{1}{3}\\,\\mathrm{min}$, giving $150 \\times \\frac{1}{3} = 50$ revolutions."
+      "unit": "rev"
     }
   },
   {
@@ -403,8 +322,7 @@
     "answer": {
       "value": 15.7,
       "tolerance": 0.2,
-      "unit": "rad/s",
-      "solution": "Apply $\\omega = \\omega_0 + \\alpha t$ with $\\omega_0 = 31.4\\,\\mathrm{rad/s}$ and $\\alpha = -1.57\\,\\mathrm{rad/s^2}$: $\\omega = 31.4 - (1.57)(10) = 31.4 - 15.7 = 15.7\\,\\mathrm{rad/s}$. Because $\\omega$ decreases linearly in time under constant $\\alpha$, the halfway point in time ($10\\,\\mathrm{s}$ of $20\\,\\mathrm{s}$) corresponds to exactly half the initial angular speed, which is what we find. Do not confuse this with a constant-torque, constant-friction situation where the speed might fall off differently; the linearity is a consequence of the stated uniform deceleration. In revolutions per minute, this is $150\\,\\mathrm{rpm}$, half of the initial $300\\,\\mathrm{rpm}$."
+      "unit": "rad/s"
     }
   },
   {
@@ -417,8 +335,7 @@
     "answer": {
       "value": 71.4,
       "tolerance": 0.5,
-      "unit": "rad/s",
-      "solution": "A rolling tire with no slipping satisfies the rolling condition $v = \\omega r$: the car's forward speed equals the tangential speed of the rim relative to the axle. Solving for the angular speed, $\\omega = \\frac{v}{r} = \\frac{25}{0.35} = 71.4\\,\\mathrm{rad/s}$. This is a very large number in everyday terms, which is why the rpm value in the next part is more intuitive. The correspondence table worth remembering: linear position $x \\leftrightarrow \\theta$, velocity $v \\leftrightarrow \\omega$, acceleration $a \\leftrightarrow \\alpha$, with $r$ the conversion factor linking each pair ($x = r\\theta$, $v = r\\omega$, $a_t = r\\alpha$)."
+      "unit": "rad/s"
     }
   },
   {
@@ -431,8 +348,7 @@
     "answer": {
       "value": 682,
       "tolerance": 5,
-      "unit": "rpm",
-      "solution": "Convert from rad/s to rpm using the two facts that $1$ revolution is $2\\pi$ radians and $1$ minute is $60$ seconds: $\\mathrm{rpm} = \\omega \\times \\frac{60}{2\\pi} = 71.4 \\times \\frac{60}{6.283} = 71.4 \\times 9.549 = 682\\,\\mathrm{rpm}$. Check by a direct route: at $25\\,\\mathrm{m/s}$ the car covers $25 \\times 60 = 1500\\,\\mathrm{m}$ per minute, and each tire revolution covers a circumference of $2\\pi r = 2\\pi(0.35) = 2.199\\,\\mathrm{m}$, so the tire turns $\\frac{1500}{2.199} = 682$ times per minute, matching. This dual route (distance per time divided by distance per revolution) is often the fastest way to reason about wheel rpm."
+      "unit": "rpm"
     }
   },
   {
@@ -445,8 +361,7 @@
     "answer": {
       "value": 1786,
       "tolerance": 20,
-      "unit": "m/s^2",
-      "solution": "A rim point moves on a circle of radius $r = 0.35\\,\\mathrm{m}$ at speed $v = 25\\,\\mathrm{m/s}$ (the car's speed, by the no-slip condition), so its centripetal acceleration is $a_c = \\frac{v^2}{r} = \\frac{25^2}{0.35} = \\frac{625}{0.35} = 1.79 \\times 10^3\\,\\mathrm{m/s^2}$. This is roughly $180g$, enormous compared with any acceleration the car itself experiences in normal driving. The reason it can be so large without tearing the tire apart is that it is a purely geometric effect of circular motion about the axle: the material of the rim is continuously redirecting its velocity, and internal stresses supply the required inward force. Contrast this with the tangential acceleration of the rim, which equals the car's linear acceleration (for example $2.0\\,\\mathrm{m/s^2}$ while speeding up), far smaller in magnitude."
+      "unit": "m/s^2"
     }
   },
   {
@@ -458,8 +373,7 @@
     "answer": {
       "value": 0.98,
       "tolerance": 0.01,
-      "unit": "kg*m^2",
-      "solution": "For point masses, the moment of inertia is the sum $I = \\sum m r^2$, where each $r$ is the distance from the axis; the rod itself is stated to be light, so its contribution is neglected. The side of the pivot does not matter, only the distance: $I = 2(0.5)^2 + 3(0.4)^2$. Computing each term: the first mass contributes $2 \\times 0.25 = 0.50\\,\\mathrm{kg{\\cdot}m^2}$ and the second contributes $3 \\times 0.16 = 0.48\\,\\mathrm{kg{\\cdot}m^2}$, so $I = 0.50 + 0.48 = 0.98\\,\\mathrm{kg{\\cdot}m^2}$. Note the quadratic weighting by distance: the lighter $2\\,\\mathrm{kg}$ mass, being farther out, contributes almost as much as the heavier $3\\,\\mathrm{kg}$ mass. Doubling a mass doubles its contribution, but doubling its distance quadruples it."
+      "unit": "kg*m^2"
     }
   },
   {
@@ -472,78 +386,7 @@
     "answer": {
       "value": 0.34,
       "tolerance": 0.01,
-      "unit": "m",
-      "solution": "The pivot, the bob, and the vertical line through the pivot form a right triangle in which the string of length $L$ is the hypotenuse and the angle at the pivot is $\\theta$ from the vertical. The horizontal circle's radius is the side opposite $\\theta$: $r = L\\sin\\theta$. Substituting, $r = 0.8\\sin 25^\\circ = 0.8 \\times 0.4226 = 0.34\\,\\mathrm{m}$. The vertical depth of the bob below the pivot, for later use, is $L\\cos\\theta = 0.8 \\times 0.9063 = 0.725\\,\\mathrm{m}$. The mass of the ball plays no role in the geometry; it will matter only when forces are computed."
-    }
-  },
-  {
-    "id": "kin-banked-18",
-    "tags": {
-      "banked-curves-and-turning-vehicles": 1.0,
-      "uniform-circular-motion": 0.5
-    },
-    "prompt": "A curve of radius $80\\,\\mathrm{m}$ is banked at $15^\\circ$. What speed allows a car to take the curve with no friction at all? (Use $g = 9.8\\,\\mathrm{m/s^2}$.)",
-    "answer": {
-      "value": 14.5,
-      "tolerance": 0.2,
-      "unit": "m/s",
-      "solution": "With no friction, the only forces on the car are gravity $mg$ straight down and the normal force $N$ perpendicular to the banked road. Choose axes with one vertical and one horizontal pointing toward the center of the curve. Resolve the normal force into $N\\cos\\theta$ (vertical) and $N\\sin\\theta$ (horizontal, toward the center). The two equations of motion are the vertical balance $N\\cos\\theta = mg$ (no vertical acceleration) and the horizontal centripetal condition $N\\sin\\theta = \\frac{mv^2}{r}$. Dividing the second by the first eliminates both $N$ and $m$: $\\tan\\theta = \\frac{v^2}{rg}$. Solve for the design speed: $v = \\sqrt{rg\\tan\\theta} = \\sqrt{(80)(9.8)(\\tan 15^\\circ)} = \\sqrt{(80)(9.8)(0.2679)} = \\sqrt{210} = 14.5\\,\\mathrm{m/s}$, about $52\\,\\mathrm{km/h}$. Two remarks: the result is completely independent of the car's mass (a truck and a bicycle take the frictionless banked curve at the same design speed), and at any other speed the car needs friction, or it will drift up or down the bank."
-    }
-  },
-  {
-    "id": "kin-block-stack-19",
-    "tags": {
-      "block-on-block-friction": 1.0,
-      "one-dimensional-motion": 0.5
-    },
-    "prompt": "A $2\\,\\mathrm{kg}$ block rests on top of a $4\\,\\mathrm{kg}$ block, which sits on a frictionless floor. The coefficient of static friction between the blocks is $0.35$. What is the largest horizontal force applied to the bottom block such that the top block does not slip? (Use $g = 9.8\\,\\mathrm{m/s^2}$.)",
-    "answer": {
-      "value": 20.6,
-      "tolerance": 0.3,
-      "unit": "N",
-      "solution": "Identify what accelerates the top block: the only horizontal force it feels is the static friction from the block beneath it, so friction must drag the $2\\,\\mathrm{kg}$ block along. The maximum friction available is $f_{s,\\max} = \\mu_s m_A g = 0.35 \\times 2 \\times 9.8 = 6.86\\,\\mathrm{N}$, which can give the top block at most $a_{\\max} = \\frac{f_{s,\\max}}{m_A} = \\mu_s g = 0.35 \\times 9.8 = 3.43\\,\\mathrm{m/s^2}$. Now treat both blocks as a single $6\\,\\mathrm{kg}$ unit, since they move together: the applied force accelerates the whole system, $F = (m_A + m_B)a$. At the threshold, $F_{\\max} = 6 \\times 3.43 = 20.6\\,\\mathrm{N}$. Push any harder and the required system acceleration exceeds $3.43\\,\\mathrm{m/s^2}$, the top block's friction supply falls short, and it slips backward relative to the bottom block."
-    }
-  },
-  {
-    "id": "kin-block-stack-20a",
-    "tags": {
-      "block-on-block-friction": 1.0,
-      "constant-acceleration-equations": 0.5
-    },
-    "prompt": "A $2\\,\\mathrm{kg}$ block (A) sits on top of a $6\\,\\mathrm{kg}$ block (B) on a frictionless floor, with $\\mu_s = 0.30$ between the blocks. What is the largest horizontal force applied to A (the top block) that keeps the blocks moving together? (Use $g = 9.8\\,\\mathrm{m/s^2}$.)",
-    "answer": {
-      "value": 7.84,
-      "tolerance": 0.1,
-      "unit": "N",
-      "solution": "This version pushes the top block instead of the bottom block, and the answer is different. Now the force acts on the top block A, and the bottom block B is moved only by the static friction at their interface. Examine block B: the only horizontal force on it is friction from A, so $f = m_B a$. The friction cannot exceed $f_{s,\\max} = \\mu_s m_A g = 0.30 \\times 2 \\times 9.8 = 5.88\\,\\mathrm{N}$ (note: capped by the normal force, which depends on A's weight, the upper block, not B's). Therefore B can be accelerated at most by $a_{\\max} = \\frac{5.88}{6} = 0.98\\,\\mathrm{m/s^2}$. Treating the pair as a single $8\\,\\mathrm{kg}$ unit moving at this acceleration, $F_{\\max} = (2 + 6)(0.98) = 7.84\\,\\mathrm{N}$. The comparison with the bottom-block case is useful: there the friction cap $\\mu_s m_A g$ only had to accelerate the light top block (giving $a_{\\max} = \\mu_s g = 2.94\\,\\mathrm{m/s^2}$ and $F_{\\max} = 20.6\\,\\mathrm{N}$ for those masses); here the same friction cap must accelerate the heavy bottom block, so the sustainable force is much smaller."
-    }
-  },
-  {
-    "id": "kin-block-stack-20b",
-    "tags": {
-      "block-on-block-friction": 1.0,
-      "constant-acceleration-equations": 0.5
-    },
-    "prompt": "A $2\\,\\mathrm{kg}$ block (A) sits on a $6\\,\\mathrm{kg}$ block (B) on a frictionless floor, with $\\mu_k = 0.20$ between the blocks. A $30\\,\\mathrm{N}$ horizontal force is applied to A, causing A to slip. What is A's acceleration? (Use $g = 9.8\\,\\mathrm{m/s^2}$.)",
-    "answer": {
-      "value": 13.0,
-      "tolerance": 0.2,
-      "unit": "m/s^2",
-      "solution": "First check that slipping makes sense: the maximum static friction would be about $\\mu_s m_A g$, and the corresponding no-slip force threshold is well below $30\\,\\mathrm{N}$, so A indeed slides on B. Once sliding, kinetic friction acts on A in the direction opposing its motion relative to B, i.e. backward. Its magnitude is $f_k = \\mu_k m_A g = 0.20 \\times 2 \\times 9.8 = 3.92\\,\\mathrm{N}$. Newton's second law for A alone: $F - f_k = m_A a_A$, so $a_A = \\frac{30 - 3.92}{2} = \\frac{26.08}{2} = 13.0\\,\\mathrm{m/s^2}$. Check the friction type: kinetic friction ($3.92\\,\\mathrm{N}$) is necessarily less than the maximum static friction ($5.88\\,\\mathrm{N}$ at $\\mu_s = 0.30$), which fits a slipping surface. Note that A's acceleration here depends only on A's own data and $F$; B's mass never enters, because the friction magnitude is set by A's weight, not B's."
-    }
-  },
-  {
-    "id": "kin-block-stack-20c",
-    "tags": {
-      "block-on-block-friction": 1.0,
-      "constant-acceleration-equations": 0.5
-    },
-    "prompt": "A $2\\,\\mathrm{kg}$ block (A) slips on top of a $6\\,\\mathrm{kg}$ block (B) on a frictionless floor, with $\\mu_k = 0.20$ between the blocks and a $30\\,\\mathrm{N}$ force applied to A. What is B's acceleration? (Use $g = 9.8\\,\\mathrm{m/s^2}$.)",
-    "answer": {
-      "value": 0.65,
-      "tolerance": 0.02,
-      "unit": "m/s^2",
-      "solution": "By Newton's third law, if kinetic friction pulls A backward with $f_k = 3.92\\,\\mathrm{N}$, it pushes B forward with the same $3.92\\,\\mathrm{N}$. This friction is the only horizontal force on B (the floor is frictionless, and B carries no applied force), so Newton's second law for B alone gives $f_k = m_B a_B$, hence $a_B = \\frac{0.20 \\times 2 \\times 9.8}{6} = \\frac{3.92}{6} = 0.65\\,\\mathrm{m/s^2}$, in the direction of the applied force. The result: A accelerates at $13.0\\,\\mathrm{m/s^2}$ while friction drags B forward at only $0.65\\,\\mathrm{m/s^2}$, so A slides forward along B, and the relative acceleration is about $12.4\\,\\mathrm{m/s^2}$. Also note B's acceleration has nothing to do with the $30\\,\\mathrm{N}$; it is set entirely by the kinetic friction, which depends on A's weight and $\\mu_k$."
+      "unit": "m"
     }
   }
 ]
